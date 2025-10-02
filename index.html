@@ -97,9 +97,6 @@
         <button class="btn" id="btnCharIntro">👤 キャラ図鑑</button>
       </div>
       <div class="row">
-        <button class="btn btn-shuffle" id="shuffleBtn">🔄 シャッフル</button>
-      </div>
-      <div class="row">
         <button class="btn btn-mini" id="bgmSel1">♪1</button>
         <button class="btn btn-mini" id="bgmSel2">♪2</button>
         <button class="btn" id="bgmBtn" onclick="toggleBGM()">♪ BGM ON</button>
@@ -233,8 +230,16 @@ function unlockAllSE(){
 }
 function userGesture(){
   unlockAllSE();
-  if(bgmOn && currentBGM().paused){
-    currentBGM().play().then(()=>{ bgmBtn.textContent="♪ BGM OFF"; }).catch(()=>{});
+// ★タッチ/移動で必ずBGMをキック（停止中なら再生し、状態もONへ）
+  if (currentBGM().paused){
+    currentBGM().currentTime = 0;
+    currentBGM().play()
+      .then(()=>{
+        bgmOn = true;
+        bgmBtn.textContent = "♪ BGM OFF";
+        store.set("bgmOn", true);
+      })
+      .catch(()=>{});
   }
 }
 (function initAudio(){
@@ -611,7 +616,6 @@ function resolveVanishAndDrop(){
       score += 10;
       if(SPECIALS.includes(b)){
         score += SPECIAL_POINTS[b];
-        rankProgress++; // ★修羅王丸の特殊ブロック消去でのみ進捗加算
       }
     }
     // 周囲のお邪魔にダメージ
@@ -635,6 +639,11 @@ function resolveVanishAndDrop(){
     if (JUSOS.includes(b)) { jusoHP[r][c] = 0; }
     set(r,c,null);
   });
+
+// ★追加：この消去で一度でも特殊ブロックが含まれていれば「回数」として1加算
+  if (specialsHit.size > 0) {
+    rankProgress++;
+  }
 
   // ③ ランク更新（ここでボイス＋se_bell が鳴る実装済み）
   const prevRank = rankIndex;
@@ -963,9 +972,6 @@ canvas.addEventListener('touchmove',e=>{ e.preventDefault(); onMove(e.touches[0]
 canvas.addEventListener('touchend',onEnd);
 
 document.getElementById("btnCharIntro").addEventListener('click', ()=>{ onClickSE(); openCharModal(); });
-document.getElementById("shuffleBtn").addEventListener('click', ()=>{ const a=SE_BANK.shuffle; if(a){ a.currentTime=0; a.play().catch(()=>{}); } shuffleBoard(); 
-if (paused) drawGame(); // ★追加：一時停止中でもシャッフル結果を即描画
-});
 document.querySelectorAll('.btn').forEach(b=>{
   if(b.id!=="shuffleBtn"){ b.addEventListener('click', onClickSE); }
 });
