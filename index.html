@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<title>修羅王丸 永遠の焦土パズル(マッチ3)</title>
+<title>修羅王丸 永遠の焦土パズル</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -19,7 +19,7 @@
   .hud{ display:flex; gap:10px; justify-content:space-between; align-items:center; margin:10px 0 6px; flex-wrap:wrap; }
   .badge{ background:linear-gradient(180deg,#1c1d22,#14151a); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-weight:700; }
   .rank-progress{ font-size:12px; font-weight:400; margin-left:8px; opacity:0.8; }
-  canvas{ display:block; margin:14px auto; width:min(92vw,480px); height:min(92vw,480px); background:#111; border-radius:14px; border:1px solid var(--line);
+  canvas{ display:block; margin:14px auto; width:min(100%,480px); height:auto; aspect-ratio:1/1; box-sizing:border-box; background:#111; border-radius:14px; border:1px solid var(--line);
     box-shadow:0 16px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset; touch-action:none; }
   .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:8px 0 12px; }
   .btn{ display:inline-flex; align-items:center; gap:.4em; font-weight:600; font-size:14px;
@@ -77,7 +77,7 @@
 <body>
   <div class="wrap">
     <div class="panel">
-      <h1>修羅王丸 永遠の焦土パズル</h1>
+      <h1>修羅王丸 永遠の焦土パズル(マッチ3)</h1>
       <p class="subtitle">3つそろえると消える—終わりなき消去と暗躍</p>
 
       <div class="hud">
@@ -949,8 +949,8 @@ function shuffleBoard(){
 
 /* 起動（A） */
 function initGame(reset=false){
-  const parentW=Math.min(640, window.innerWidth||document.documentElement.clientWidth);
-  logicalSize = Math.floor(Math.min(parentW-32,480)/size)*size;
+const parentW = Math.min(640, (canvas.parentElement?.getBoundingClientRect().width)||window.innerWidth||document.documentElement.clientWidth);
+  logicalSize = Math.floor(Math.min(parentW,480)/size)*size
   tileSize = logicalSize/size;
   DPR=Math.max(1,Math.min(3,Math.floor(window.devicePixelRatio||1)));
   canvas.width=logicalSize*DPR; canvas.height=logicalSize*DPR; ctx.setTransform(1,0,0,1,0,0); ctx.scale(DPR,DPR);
@@ -986,4 +986,3 @@ startUp();
 </script>
 </body>
 </html>
-
