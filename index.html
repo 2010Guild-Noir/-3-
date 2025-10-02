@@ -168,8 +168,8 @@ const bgmSel1 = document.getElementById("bgmSel1");
 const bgmSel2 = document.getElementById("bgmSel2");
 const seBtn  = document.getElementById("seBtn");
 
-const BGM_DEFAULT_VOL = 0.25;
-const SE_DEFAULT_VOL  = 0.35;
+const BGM_DEFAULT_VOL = 0.35;
+const SE_DEFAULT_VOL  = 0.25;
 
 function makePool(a,n){ const arr=[a]; for(let i=1;i<n;i++) arr.push(a.cloneNode(true)); let idx=0;
   return { play(v){ const e=arr[idx++%arr.length]; try{e.pause();e.currentTime=0;}catch(_){}
