@@ -19,8 +19,14 @@
   .hud{ display:flex; gap:10px; justify-content:space-between; align-items:center; margin:10px 0 6px; flex-wrap:wrap; }
   .badge{ background:linear-gradient(180deg,#1c1d22,#14151a); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-weight:700; }
   .rank-progress{ font-size:12px; font-weight:400; margin-left:8px; opacity:0.8; }
-canvas{ display:block; margin:18px auto; width:480px; height:auto; aspect-ratio:1/1; box-sizing:border-box; background:#111; border-radius:14px; border:1px solid var(--line);
-   box-shadow:0 16px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset; touch-action:none; }
+canvas{ display:block; margin:18px auto; width:min(92vw, 480px); height:auto;             /* 正方形は aspect-ratio ではなく内部解像度で担保 */
+  box-sizing:border-box;
+  background:#111;
+  border-radius:14px;
+  border:1px solid var(--line);
+  box-shadow:0 16px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset;
+  touch-action:none;
+}
  .panel{ overflow:hidden; } /* はみ出しを左右均等にクリップ */
   .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 12px; }
   .btn{ display:inline-flex; align-items:center; gap:.4em; font-weight:600; font-size:14px;
@@ -50,7 +56,7 @@ canvas{ display:block; margin:18px auto; width:480px; height:auto; aspect-ratio:
   .char-modal-content { background:#191b1f; padding:25px; border-radius:12px; max-width:90%; max-height:80%; overflow-y:auto; position:relative; color:var(--ink); text-align:left; border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.6); }
   .close-btn { position:absolute; top:10px; right:15px; font-size:28px; font-weight:bold; cursor:pointer; color:var(--muted); }
   .char-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:15px;margin-top:20px; }
-  .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:5; transition:opacity .3s; }
+  .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:1; transition:opacity .3s; }
   .char-item.unlocked{ opacity:1; }
   .char-item h4 { margin:0 0 5px 0; font-size:16px; }
   .char-item p { margin:0; font:12px; color:var(--muted); }
@@ -170,7 +176,6 @@ details.help li {
   <audio id="vo_rank2" src="audio/vo_rank2.mp3" preload="auto"></audio>
   <audio id="vo_rank3" src="audio/vo_rank3.mp3" preload="auto"></audio>
   <audio id="vo_rank4" src="audio/vo_rank4.mp3" preload="auto"></audio>
-  <audio id="vo_shuffle" src="audio/vo_shuffle.mp3" preload="auto"></audio>
 
 <script>
 "use strict";
@@ -660,11 +665,14 @@ function resolveVanishAndDrop(){
         }
       }
     }
-    if (JUSOS.includes(b)) { jusoHP[r][c] = 0; }
-    set(r,c,null);
+      if (JUSOS.includes(b)) {
+      // お邪魔は直接は消さない（隣接ダメージのみでHPを削る）
+    } else {
+      set(r,c,null);
+    }
   });
 
-// ★追加：この消去で一度でも特殊ブロックが含まれていれば「回数」として1加算
+// この消去で一度でも特殊ブロックが含まれていれば「回数」として1加算
   if (specialsHit.size > 0) {
     rankProgress++;
   }
@@ -970,19 +978,31 @@ function shuffleBoard(){
   updateStatus("status: 盤面をシャッフルしました。");
   animState="drop"; prepareDrop();
 }
+function resizeCanvasCSS(){
+  const cssW = Math.min(480, Math.floor(window.innerWidth * 0.92));
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = 'auto';
+}
 
 /* 起動（A） */
 function initGame(reset=false){
-const parentW = 480;                      // ★固定サイズに
-  logicalSize = Math.floor(480/size)*size;  // ★盤面ロジックも固定
+  const parentW = 480;
+  logicalSize = Math.floor(480/size)*size;
   tileSize = logicalSize/size;
-  DPR=Math.max(1,Math.min(3,Math.floor(window.devicePixelRatio||1)));
-  canvas.width=logicalSize*DPR; canvas.height=logicalSize*DPR; ctx.setTransform(1,0,0,1,0,0); ctx.scale(DPR,DPR);
-  canvas.style.width = logicalSize + 'px'; canvas.style.height = 'auto';
+  DPR = Math.max(1, Math.min(3, Math.floor(window.devicePixelRatio || 1)));
+  canvas.width  = logicalSize * DPR;
+  canvas.height = logicalSize * DPR;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(DPR, DPR);
+
+  resizeCanvasCSS();                   // ★ここで可変表示幅を適用
   if(reset) initBoard();
   updateScoresUI(); setMode('kanki');
   if(!reset) gameLoop();
 }
+// 起動後とリサイズ・回転時に追従
+window.addEventListener('resize', resizeCanvasCSS);
+window.addEventListener('orientationchange', resizeCanvasCSS);
 function startUp(){ loadImages(()=>{ initGame(true); updateStatus("status: game loaded. ready to play."); gameLoop(); }); }
 
 /* イベント（Aのまま。ボタンSEは se_push に統一） */
