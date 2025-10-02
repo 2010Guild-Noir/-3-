@@ -12,14 +12,14 @@
                linear-gradient(180deg, #0b0b0c 0%, #09090a 100%); min-height:100dvh; text-align:center; }
   .wrap{ max-width:640px; margin:22px auto 28px; padding:16px; }
   .panel{ margin:0 auto; padding:16px 14px; border-radius:16px; background:#121316; border:1px solid var(--line);
-    box-shadow:0 18px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset; backdrop-filter:saturate(120%) blur(8px);  box-sizing:border-box;}
+    box-shadow:0 18px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset; backdrop-filter:saturate(120%) blur(8px); }
   /* タイトルサイズ＝B */
   h1{ font-size:22px; letter-spacing:.03em; margin:4px 0 2px; font-weight:700; }
   .subtitle{ font-size:12.5px; color:var(--muted); margin:0 0 10px; letter-spacing:.05em; }
   .hud{ display:flex; gap:10px; justify-content:space-between; align-items:center; margin:10px 0 6px; flex-wrap:wrap; }
   .badge{ background:linear-gradient(180deg,#1c1d22,#14151a); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-weight:700; }
   .rank-progress{ font-size:12px; font-weight:400; margin-left:8px; opacity:0.8; }
-canvas{ max-width:480px; display:block; margin:18px auto; width:100%; height:auto; aspect-ratio:1/1; box-sizing:border-box; background:#111; border-radius:14px; border:1px solid var(--line);
+canvas{ max-width:480px; box-sizing:border-box; display:block; margin:18px auto; width:100%; height:auto; aspect-ratio:1/1; box-sizing:border-box; background:#111; border-radius:14px; border:1px solid var(--line);
    box-shadow:0 16px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset; touch-action:none; }
  .panel{ overflow:hidden; } /* はみ出しを左右均等にクリップ */
   .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 12px; }
@@ -50,7 +50,7 @@ canvas{ max-width:480px; display:block; margin:18px auto; width:100%; height:aut
   .char-modal-content { background:#191b1f; padding:25px; border-radius:12px; max-width:90%; max-height:80%; overflow-y:auto; position:relative; color:var(--ink); text-align:left; border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.6); }
   .close-btn { position:absolute; top:10px; right:15px; font-size:28px; font-weight:bold; cursor:pointer; color:var(--muted); }
   .char-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:15px;margin-top:20px; }
-  .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:1; transition:opacity .3s; }
+  .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:5; transition:opacity .3s; }
   .char-item.unlocked{ opacity:1; }
   .char-item h4 { margin:0 0 5px 0; font-size:16px; }
   .char-item p { margin:0; font:12px; color:var(--muted); }
@@ -94,6 +94,17 @@ details.help ul,
 details.help li {
   text-align: left;
 }
+
+
+/* === MAX Reset UI === */
+#maxResetBtn{position:fixed;top:10px;right:10px;width:28px;height:28px;border-radius:9999px;border:1px solid var(--line);background:rgba(20,20,20,.85);color:var(--text);font-size:11px;line-height:28px;text-align:center;cursor:pointer;opacity:.85;display:none;z-index:9999;}
+#maxResetBtn:hover{opacity:1;}
+#maxResetConfirm{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:10000;}
+#maxResetConfirm .panel{background:#111;border:1px solid var(--line);border-radius:12px;padding:14px 16px;max-width:88vw;box-shadow:0 10px 28px rgba(0,0,0,.6);}
+#maxResetConfirm .title{font-size:14px;margin-bottom:10px;}
+#maxResetConfirm .cmds{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;}
+#maxResetConfirm .cmds button{font-size:13px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:#1c1c1c;color:var(--text);cursor:pointer;}
+#maxResetConfirm .cmds button.primary{background:#2a2a2a;}
 
 </style>
 </head>
@@ -288,7 +299,7 @@ const $status = document.getElementById("status");
 const $charModal = document.getElementById("char-modal");
 const $charList = document.getElementById("char-list");
 
-const size = 8;
+const size = 7;
 let logicalSize = 400;
 let tileSize = logicalSize/size;
 let DPR = Math.max(1, Math.min(3, Math.floor(window.devicePixelRatio || 1)));
@@ -336,8 +347,8 @@ const CHARACTERS = [
   { sym: "S_UNK", name: "修羅王丸・アンノウン", tag: "特殊", desc: "未だ見ぬ先の境地。斜め列を消去する（切り替え可能）。", image: "S_UNK", unlock: { key: "rank", value: 4 } },
 
   { sym: "J_NEM", name: "合歓", tag: "呪詛", desc: "修羅王丸を恨む娘。隣接する消去でHPを削る。HP:1。", image: "J_NEM", unlock: { key: "juso_spawn", value: true } },
-  { sym: "J_SHI", name: "辰十郎", tag: "悔恨", desc: "筑前忍八剣衆の前元締。隣接する消去でHPを削る。HP:2。", image: "J_SHI", unlock: { key: "juso_spawn", value: true } },
-  { sym: "J_PRO", name: "プロパガンダ", tag: "脅威", desc: "鏡写しの世界に住む正義の修羅王丸。隣接する消去でHPを削る。HP:3。", image: "J_PRO", unlock: { key: "juso_spawn", value: true } },
+  { sym: "J_SHI", name: "辰十郎", tag: "悔恨", desc: "筑前忍八剣衆の前元締。隣接する消去でHPを削る。HP:3。", image: "J_SHI", unlock: { key: "juso_spawn", value: true } },
+  { sym: "J_PRO", name: "プロパガンダ", tag: "脅威", desc: "鏡写しの世界に住む正義の修羅王丸。隣接する消去でHPを削る。HP:5。", image: "J_PRO", unlock: { key: "juso_spawn", value: true } },
 ];
 let unlockedChars = store.get("unlockedChars", { initial: true, juso_spawn: false });
 
@@ -367,7 +378,7 @@ function updateCharModalContent(){
   $charList.innerHTML=html;
 }
 function openCharModal(){ if(!paused) togglePause(); updateCharModalContent(); $charModal.classList.add("open"); }
-function closeCharModal(){ $charModal.classList.remove("open"); }
+function closeCharModal(){ $charModal.classList.remove("open"); if(paused) togglePause(); }
 
 /* ===== ランク・種別（A） ===== */
 const RANKS = [
@@ -378,6 +389,9 @@ const RANKS = [
   { key:"S_UNK", name:"アンノウン", score: 500 }
 ];
 const MAX_RANK_INDEX = RANKS.length - 1;
+
+let maxAchieved = !!store.get('maxAchieved');
+let specialPerkUnlocked = !!store.get('specialPerkUnlocked');
 const NORMALS=["SANZU","MUTSU","HANZO","CHIEKO"];
 const SPECIALS=RANKS.map(r=>r.key);
 const JUSOS=["J_NEM", "J_SHI", "J_PRO"];
@@ -461,6 +475,8 @@ function updateScoresUI(){
   }
   // 永続
   store.set("score",score); store.set("rankIndex",rankIndex); store.set("rankProgress",rankProgress);
+
+  try{ if(window.__gateMaxResetBtn) window.__gateMaxResetBtn(); }catch(_){ }
 }
 
 /* ===== 盤面（A） ===== */
@@ -559,6 +575,18 @@ function findMatches(checkOnly=true){
 
 /* ランク進捗・ボイス（A） */
 function updateRank(){
+  // Post-top progress handling
+  if(rankIndex===MAX_RANK_INDEX){
+    if(!maxAchieved && rankProgress>=RANK_THRESH[rankIndex]){
+      rankProgress = RANK_THRESH[rankIndex];
+      maxAchieved = true; store.set('maxAchieved', true);
+      specialPerkUnlocked = true; store.set('specialPerkUnlocked', true);
+      try{ Sound.play('bell', 1.0); }catch(_){}
+      try{ const v=document.getElementById('vo_rank5'); if(v){ v.volume=1.0; v.play().catch(()=>{}); } }catch(_){}
+    }
+    if(rankProgress>RANK_THRESH[rankIndex]) rankProgress = RANK_THRESH[rankIndex];
+  }
+
   if(rankIndex<MAX_RANK_INDEX && rankProgress>=RANK_THRESH[rankIndex]){
     rankProgress=0; rankIndex++;
     const v = document.getElementById(`vo_rank${Math.min(rankIndex,4)}`);
@@ -567,7 +595,7 @@ function updateRank(){
   }
   if(rankIndex>=1 && !unlockedChars.juso_spawn){ unlockedChars.juso_spawn=true; store.set("unlockedChars", unlockedChars); }
   updateScoresUI();
-}
+      }
 
 /* 消去→落下（A：下へ圧縮→上から補充） */
 const SEED_BASE_CHANCE = 0.06;
@@ -660,9 +688,8 @@ function resolveVanishAndDrop(){
         }
       }
     }
-    if (JUSOS.includes(b)) { jusoHP[r][c] = 0; }
     if (JUSOS.includes(b)) {
-      // obstacle: do not delete directly; HP is only reduced by adjacency
+      /* obstacle: keep until HP zero via adjacency */
     } else {
       set(r,c,null);
     }
@@ -670,7 +697,7 @@ function resolveVanishAndDrop(){
 
 // ★追加：この消去で一度でも特殊ブロックが含まれていれば「回数」として1加算
   if (specialsHit.size > 0) {
-    rankProgress++;
+    if(!(rankIndex===MAX_RANK_INDEX && maxAchieved)) rankProgress++;
   }
 
   // ③ ランク更新（ここでボイス＋se_bell が鳴る実装済み）
@@ -740,7 +767,7 @@ function prepareDrop(){
     for(let r=0;r<emptyCount;r++){
       let nb=getInitialBlock();
       if(Math.random()<SEED_BASE_CHANCE){
-        nb = (rankIndex===MAX_RANK_INDEX && selectedSpecialOverride)
+        nb = (specialPerkUnlocked && selectedSpecialOverride)
              ? selectedSpecialOverride
              : SPECIALS[Math.min(rankIndex, SPECIALS.length-1)];
         Sound.play('shine', 0.7);   // 特殊出現音
@@ -793,7 +820,7 @@ function createParticles(matches){
   matches.forEach(p=>{
     const [r,c]=p.split(',').map(Number);
     const cx=c*tileSize+tileSize/2, cy=r*tileSize+tileSize/2;
-    for(let i=0;i<8;i++){
+    for(let i=0;i<size;i++){
       particles.push({
         x:cx, y:cy,
         vx:(Math.random()-0.5)*tileSize*0.18,
@@ -984,7 +1011,8 @@ const parentW = 480;                      // ★固定サイズに
   canvas.width=logicalSize*DPR; canvas.height=logicalSize*DPR; ctx.setTransform(1,0,0,1,0,0); ctx.scale(DPR,DPR);
   canvas.style.width = '100%'; canvas.style.height = 'auto';
   if(reset) initBoard();
-  updateScoresUI(); setMode('kanki');
+  updateScoresUI();
+      setMode('kanki');
   if(!reset) gameLoop();
 }
 function startUp(){ loadImages(()=>{ initGame(true); updateStatus("status: game loaded. ready to play."); gameLoop(); }); }
@@ -1012,5 +1040,49 @@ window.addEventListener('beforeunload', ()=>{
 
 startUp();
 </script>
+  <audio id="vo_reverse" src="audio/vo_reverse.mp3" preload="auto"></audio>
+  <audio id="vo_rank5" src="audio/vo_rank5.mp3" preload="auto"></audio>
+
+<div id="maxResetBtn" title="MAXをリバース">↺</div>
+<div id="maxResetConfirm" role="dialog" aria-modal="true">
+  <div class="panel">
+    <div class="title">修羅王丸の覚醒ランクをリバースしますか</div>
+    <div class="cmds">
+      <button id="maxResetNo">いいえ</button>
+      <button id="maxResetYes" class="primary">はい</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $btn = document.getElementById('maxResetBtn');
+  const $dlg = document.getElementById('maxResetConfirm');
+  const $yes = document.getElementById('maxResetYes');
+  const $no  = document.getElementById('maxResetNo');
+  function gateMaxResetBtn(){
+    if(!$btn) return;
+    if(typeof rankIndex!=='undefined' && typeof MAX_RANK_INDEX!=='undefined' && typeof maxAchieved!=='undefined'){
+      $btn.style.display = (rankIndex===MAX_RANK_INDEX && maxAchieved) ? '' : 'none';
+    }
+  }
+  if($btn){ $btn.addEventListener('click', ()=>{ if($dlg) $dlg.style.display='flex'; }); }
+  if($no){ $no.addEventListener('click', ()=>{ if($dlg) $dlg.style.display='none'; }); }
+  if($yes){
+    $yes.addEventListener('click', ()=>{
+      try{
+        maxAchieved = false; if(store&&store.set){ store.set('maxAchieved', false); }
+        rankIndex = 0; rankProgress = 0;
+        if(store&&store.set){ store.set('rankIndex',0); store.set('rankProgress',0); }
+        updateScoresUI();
+        try{ const v=document.getElementById('vo_reverse'); if(v){ v.currentTime=0; v.volume=1.0; v.play().catch(()=>{}); } }catch(_){}
+      try{ Sound.play('cancel', 0.8); }catch(_){}
+        }catch(e){}
+      if($dlg) $dlg.style.display='none';
+      gateMaxResetBtn();
+    });
+  }
+  window.__gateMaxResetBtn = gateMaxResetBtn;
+})();</script>
 </body>
 </html>
