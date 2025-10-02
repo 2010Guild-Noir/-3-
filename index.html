@@ -19,9 +19,10 @@
   .hud{ display:flex; gap:10px; justify-content:space-between; align-items:center; margin:10px 0 6px; flex-wrap:wrap; }
   .badge{ background:linear-gradient(180deg,#1c1d22,#14151a); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-weight:700; }
   .rank-progress{ font-size:12px; font-weight:400; margin-left:8px; opacity:0.8; }
-  canvas{ display:block; margin:14px auto; width:min(100%,480px); height:auto; aspect-ratio:1/1; box-sizing:border-box; background:#111; border-radius:14px; border:1px solid var(--line);
-    box-shadow:0 16px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset; touch-action:none; }
-  .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:8px 0 12px; }
+canvas{ display:block; margin:18px auto; width:480px; height:auto; aspect-ratio:1/1; box-sizing:border-box; background:#111; border-radius:14px; border:1px solid var(--line);
+   box-shadow:0 16px 40px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset; touch-action:none; }
+ .panel{ overflow:hidden; } /* はみ出しを左右均等にクリップ */
+  .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 12px; }
   .btn{ display:inline-flex; align-items:center; gap:.4em; font-weight:600; font-size:14px;
     background:linear-gradient(180deg,#202126,#14151a); color:#fff; border:1px solid var(--line);
     border-radius:999px; padding:8px 12px; cursor:pointer; user-select:none;
@@ -48,8 +49,8 @@
   .modal-overlay.open { display: flex; }
   .char-modal-content { background:#191b1f; padding:25px; border-radius:12px; max-width:90%; max-height:80%; overflow-y:auto; position:relative; color:var(--ink); text-align:left; border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.6); }
   .close-btn { position:absolute; top:10px; right:15px; font-size:28px; font-weight:bold; cursor:pointer; color:var(--muted); }
-  .char-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:15px; margin-top:20px; }
-  .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:.5; transition:opacity .3s; }
+  .char-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:15px;margin-top:20px; }
+  .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:5; transition:opacity .3s; }
   .char-item.unlocked{ opacity:1; }
   .char-item h4 { margin:0 0 5px 0; font-size:16px; }
   .char-item p { margin:0; font:12px; color:var(--muted); }
@@ -67,18 +68,40 @@
 
   /* 最終ランク時：特殊選択行のアイコンボタン */
   #rankSelectRow .btn-icon{
-    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:10px;
-    font-size:12px; line-height:1; border:1px solid var(--line); background:linear-gradient(180deg,#222,#16171b);
+    display:inline-flex; align-items:center; gap:4px; padding:2px 4px; border-radius:10px;
+    font-size:12px; line-height:0; border:1px solid var(--line); background:linear-gradient(180deg,#222,#16171b);
   }
-  #rankSelectRow .btn-icon img{ width:25px; height:25px; border-radius:3px; display:block; } /* アイコンだけ少し拡大 */
+/* 特殊選択ボタン同士の間隔を広げる（アイコンサイズや枠サイズはそのまま） */
+#rankSelectRow { 
+  gap: 14px;         /* ← ここでボタン間を広げます（お好みで14〜20に調整可） */
+}
+  #rankSelectRow .btn-icon img{ width:40px; height:40px; border-radius:3px; display:block; } /* 特殊アイコンだけ少し拡大 */
   #rankSelectRow .btn-icon.active{ outline:2px solid #7fb7ff; }
+
+/* パネル外へ描画がはみ出さないように */
+.panel{ overflow: hidden; }
+
+/* 連続するボタン行の間を広めに */
+.panel > .row + .row { margin-top: 10px; }
+/* 盤面以外のボタン行は左右に広げつつ、間隔も少し広め（前回の指定を上書き） */
+.panel > .row:not(#rankSelectRow) {
+  justify-content: center; /* ← or flex-start。space-between をやめる */
+  gap: 12px;               /* お好みの狭さに調整 */
+  width: 100%;
+}
+details.help summary,
+details.help ul,
+details.help li {
+  text-align: left;
+}
+
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="panel">
       <h1>修羅王丸 永遠の焦土パズル</h1>
-      <p class="subtitle">3つ揃えると消える—終わりなき消去と暗躍</p>
+      <p class="subtitle">3つそろえると消える—終わりなき消去と暗躍</p>
 
       <div class="hud">
         <div class="badge" id="score">暗躍値: 0</div> <!-- Lv表示は削除（B） -->
@@ -109,10 +132,11 @@
       <details class="help" open>
         <summary>操作方法（PC／スマホ）</summary>
         <ul>
-          <li><b>入れ替え：</b> ブロックをドラッグ／スワイプで上下左右の隣へ。<br> 縦/横に3つ以上揃えると消去します。</li>
-          <li><b>暗躍値：</b> ブロックを消去すると暗躍値（スコア）が追加されます。<br> 中断してもスコアは引き継がれます。</li>
-          <li><b>修羅王丸：</b> 修羅王丸を必要数消去すると覚醒(ランクアップ)します。<br> 最高値到達後は永遠の暗躍をお楽しみください。</li>
+          <li><b>入れ替え：ブロックをドラッグ／スワイプで上下左右の隣へ。<br> 縦/横に3つ以上揃えると消去します。</li>
+          <li><b>暗躍値：ブロックを消去すると暗躍値(スコア)が追加されます。<br> 中断してもスコアは引き継がれます。</li>
+          <li><b>修羅王丸：修羅王丸を必要数消去すると覚醒(ランクアップ)します。<br> 覚醒最高値後は永遠の暗躍をお楽しみください。</li>
         </ul>
+<small class="note"> ⚠詰んでしまったら一度ブラウザを閉じてください。盤面がシャッフルされます。</small>
       </details>
 
       <small class="note">Ⓒ 2010 Guild Noir. 　修羅王丸®</small>
@@ -321,7 +345,7 @@ function tagClassByChar(ch){
   // 特殊（SPECIALS 配列に含まれる）
   if (Array.isArray(SPECIALS) && SPECIALS.includes(ch.sym)) return "orange";
   // お邪魔3種（合歓・辰十郎・プロパガンダ）
-  if (ch.sym === "J_NEM" || ch.sym === "J_SHI" || ch.sym === "J_PRO") return "yellow";
+  if (ch.sym === "J_NEM" || ch.sym === "J_SHI" || ch.sym === "J_PRO") return "red";
   // 通常
   return "neutral";
 }
@@ -738,7 +762,7 @@ function prepareDrop(){
 /* お邪魔生成（A） */
 function maybeSpawnObstacles(){
   if(rankIndex<1) return;
-  if(Math.random()>0.08) return;
+  if(Math.random()>0.16) return; //お邪魔ブロックの出現率を2倍に
   const n = 1 + (Math.random()<0.35?1:0);
   let k=0, guard=100;
   while(k<n && guard--){
@@ -949,12 +973,12 @@ function shuffleBoard(){
 
 /* 起動（A） */
 function initGame(reset=false){
-const parentW = Math.min(640, (canvas.parentElement?.getBoundingClientRect().width)||window.innerWidth||document.documentElement.clientWidth);
-  logicalSize = Math.floor(Math.min(parentW,480)/size)*size
+const parentW = 480;                      // ★固定サイズに
+  logicalSize = Math.floor(480/size)*size;  // ★盤面ロジックも固定
   tileSize = logicalSize/size;
   DPR=Math.max(1,Math.min(3,Math.floor(window.devicePixelRatio||1)));
   canvas.width=logicalSize*DPR; canvas.height=logicalSize*DPR; ctx.setTransform(1,0,0,1,0,0); ctx.scale(DPR,DPR);
-  canvas.style.width=logicalSize+'px'; canvas.style.height=logicalSize+'px';
+  canvas.style.width = logicalSize + 'px'; canvas.style.height = 'auto';
   if(reset) initBoard();
   updateScoresUI(); setMode('kanki');
   if(!reset) gameLoop();
