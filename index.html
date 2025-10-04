@@ -37,18 +37,18 @@ canvas{ max-width:480px; box-sizing:border-box; display:block; margin:18px auto;
   .btn-mini{ padding:4px 8px; font-size:12px; }
   .status{ margin:6px 0 10px; font-size:12.5px; color:var(--muted); }
 
-  /* 操作方法＝B（枠内） */
+  /* 操作方法 */
   details.help{ text-align:left; background:linear-gradient(180deg,#14151a,#111217); border:1px solid var(--line);
                 border-radius:14px; padding:12px 14px; margin:14px 0; box-shadow:0 12px 32px rgba(0,0,0,.35) inset; }
   details.help summary{ cursor:pointer; font-weight:700; }
   details.help ul{ margin:8px 0 0 18px; } details.help li{ margin:4px 0; line-height:1.6; }
   small.note{ opacity:.75; display:block; margin-top:6px; }
 
-  /* モーダル（図鑑）＝A本体 + タグ見た目はB準拠 */
+  /* モーダル（図鑑） */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
   .modal-overlay.open { display: flex; }
   .char-modal-content { background:#191b1f; padding:25px; border-radius:12px; max-width:90%; max-height:80%; overflow-y:auto; position:relative; color:var(--ink); text-align:left; border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.6); }
-  .close-btn { position:absolute; top:10px; right:15px; font-size:28px; font-weight:bold; cursor:pointer; color:var(--muted); }
+  
   .char-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:15px;margin-top:20px; }
   .char-item { border:1px solid #333; padding:10px; border-radius:8px; background:#222; opacity:5; transition:opacity .3s; }
   .char-item.unlocked{ opacity:1; }
@@ -57,7 +57,7 @@ canvas{ max-width:480px; box-sizing:border-box; display:block; margin:18px auto;
   .char-item img { width:40px; height:40px; margin-right:10px; border-radius:4px; vertical-align:middle; }
   .char-item .title-row { display:flex; align-items:center; }
 
-  /* 図鑑のタグ（B準拠のサイズ/雰囲気 + 指定色） */
+  /* 図鑑のタグ */
   .char-tag{ display:inline-block; font-size:10px; padding:3px 6px; border-radius:4px; font-weight:700; border:1px solid #444; margin-left:6px; }
   .char-tag.yellow{ background:#4d4200; border-color:#6b5e00; color:#ffd900; } /* 合歓=黄色 */
   .char-tag.blue  { background:#0c2a4a; border-color:#174a7a; color:#7fc8ff; } /* 辰十郎=青 */
@@ -106,6 +106,141 @@ details.help li {
 #maxResetConfirm .cmds button{font-size:13px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:#1c1c1c;color:var(--text);cursor:pointer;}
 #maxResetConfirm .cmds button.primary{background:#2a2a2a;}
 
+
+/* === HOWTO: アイコンを画像に差し替え === */
+#howtoBtn svg { display: none; }
+
+#howtoBtn{
+  width: 32px; height: 32px;
+  display: inline-grid; place-items: center;
+  background:
+    rgba(20,20,20,.9)
+    url("images/howtobutton.png") center/20px 20px no-repeat;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: transparent;
+}
+
+/* 閉じる × を画像に差し替え */
+#howtoModal .howto-close{
+  position: absolute; top: 10px; right: 15px;
+  z-index: 1000;
+  width: 36px; height: 36px;
+  background: transparent url("images/closebutton.png") center/contain no-repeat;
+  border: none;
+  color: transparent;
+  text-indent: -9999px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* === HOWTO: 右上ボタン＋モーダル === */
+#howtoBtn{position:fixed;top:10px;right:48px;width:32px;height:32px;display:inline-grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:rgba(20,20,20,.9);color:transparent;cursor:pointer;z-index:10005;}
+#howtoBtn svg{display:none;}
+#howtoBtn{background:rgba(20,20,20,.9) url("images/howtobutton.png") center/20px 20px no-repeat;}
+#howtoModal[hidden]{display:none;}
+#howtoModal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.5);z-index:10010;}
+#howtoModal .howto-panel{background:#111;color:var(--ink);border:1px solid var(--line);border-radius:14px;width:min(92vw,720px);max-height:90vh;box-shadow:0 10px 28px rgba(0,0,0,.6);position:relative;padding:14px 14px 10px;}
+#howtoModal .howto-close{position:absolute;top:10px;right:15px;z-index:1000;width:36px;height:36px;background:transparent url("images/closebutton.png") center/contain no-repeat;border:none;color:transparent;text-indent:-9999px;overflow:hidden;cursor:pointer;box-shadow:none;border-radius:0;padding:0;}
+#howtoModal .howto-img-wrap{position:relative;display:grid;place-items:center;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;}
+#howtoModal img#howtoImg{width:100%;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none;}
+#howtoModal .howto-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:9999px;border:1px solid var(--line);background:rgba(28,28,28,.9);color:var(--ink);cursor:pointer;z-index:10;}
+#howtoModal .howto-nav.prev{left:8px;}
+#howtoModal .howto-nav.next{right:8px;}
+#howtoModal .howto-caption{margin-top:8px;text-align:center;font-size:13px;opacity:.9;}
+
+#howtoBtn { border-color: #4169E1; } /* ボタン枠の色 */
+
+
+/* === 図鑑の閉じるボタンを画像に置換 === */
+#char-modal 
+
+
+
+/* === 図鑑の閉じるボタンを画像に置換（仕様固定） === */
+#char-modal .close-btn{
+  position: absolute; top: 10px; right: 15px;
+  z-index: 1000;
+  display: inline-block;
+  width: 36px; height: 36px;
+  background: transparent url("images/closebutton.png") center/contain no-repeat;
+  cursor: pointer;
+
+  /* テキスト×は視覚的に隠す（クリック判定は残す） */
+  color: transparent;
+  text-indent: -9999px;
+  overflow: hidden;
+
+  /* 以前のフォントサイズや枠が効いていれば無効化 */
+  font-size: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+#char-modal .close-btn:hover { filter: brightness(1.1); }
+
+
+/* === FINAL OVERRIDE: 図鑑の閉じるボタン（画像・右上固定） === */
+#char-modal .close-btn,
+#char-modal button.close-btn,
+#char-modal span.close-btn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 15px !important;
+  left: auto !important;
+  z-index: 1000 !important;
+
+  display: inline-block !important;
+  width: 36px !important;
+  height: 36px !important;
+
+  background-image: url("images/closebutton.png") !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  background-color: transparent !important;
+
+  cursor: pointer !important;
+
+  /* テキスト×は不可視（アクセシビリティは aria-label で確保） */
+  color: transparent !important;
+  text-indent: -9999px !important;
+  overflow: hidden !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+#char-modal .close-btn:hover,
+#char-modal button.close-btn:hover,
+#char-modal span.close-btn:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* === 図鑑タイトル上の余白を狭める === */
+#char-modal .modal-header,
+#char-modal .header,
+#char-modal .char-header {
+  padding-top: 4px !important;   /* ← ヘッダーの内側上余白 */
+}
+
+#char-modal h1,
+#char-modal h2,
+#char-modal .title,
+#char-modal .char-title {
+  margin-top: 2px !important;    /* ← 見出し自体の上マージン */
+  line-height: 1.2;              /* （任意）行間も少し詰める */
+}
+
+
 </style>
 </head>
 <body>
@@ -152,7 +287,7 @@ details.help li {
 
       <small class="note">Ⓒ 2010 Guild Noir. 　修羅王丸®</small>
 
-      <!-- 図鑑モーダル＝A（タグはB風） -->
+      <!-- 図鑑モーダル -->
       <div id="char-modal" class="modal-overlay" onclick="if(event.target.id === 'char-modal') closeCharModal()">
         <div class="char-modal-content">
           <span class="close-btn" onclick="closeCharModal()">&times;</span>
@@ -181,8 +316,6 @@ details.help li {
   <audio id="vo_rank2" src="audio/vo_rank2.mp3" preload="auto"></audio>
   <audio id="vo_rank3" src="audio/vo_rank3.mp3" preload="auto"></audio>
   <audio id="vo_rank4" src="audio/vo_rank4.mp3" preload="auto"></audio>
-  <audio id="vo_shuffle" src="audio/vo_shuffle.mp3" preload="auto"></audio>
-
 <script>
 "use strict";
 
@@ -218,7 +351,6 @@ const SE_BANK = {
   shine:document.getElementById("se_shine"),  // shineは別用途のまま
   push:document.getElementById("se_push"),    // ボタン操作音
   bell:document.getElementById("se_bell"),
-  shuffle:document.getElementById("vo_shuffle"),
 };
 const Sound={ enabled:store.get("seOn", true), vol:store.get("seVol", SE_DEFAULT_VOL), pools:{},
   init(){ for(const k in SE_BANK){ if(SE_BANK[k]) this.pools[k]=makePool(SE_BANK[k],6); } },
@@ -307,7 +439,7 @@ let paused = false;
 let isKanki = true;
 const DRAG_THRESHOLD = 0.35;
 
-/* ===== 画像（A） ===== */
+/* ===== 画像 ===== */
 const IMG = {
   "SANZU": new Image(), "MUTSU": new Image(), "HANZO": new Image(), "CHIEKO": new Image(),
   "S_BIR": new Image(), "S_NE0": new Image(), "S_SHU": new Image(), "S_REQ": new Image(), "S_UNK": new Image(),
@@ -326,6 +458,11 @@ const IMG = {
   "PATH_J_PRO": "images/propaganda.png",
   "BG": new Image(), "PATH_BG": "images/boad_bg.png"
 };
+const HOWTO_IMAGES = [
+  "img/howto1.png",
+  "img/howto2.png",
+  "img/howto3.png"
+];
 function loadImages(done){
   let loaded=0; const keys=Object.keys(IMG).filter(k=>!k.startsWith('PATH_')); const total=keys.length;
   if(total===0){ done(); return; }
@@ -395,8 +532,9 @@ let specialPerkUnlocked = !!store.get('specialPerkUnlocked');
 const NORMALS=["SANZU","MUTSU","HANZO","CHIEKO"];
 const SPECIALS=RANKS.map(r=>r.key);
 const JUSOS=["J_NEM", "J_SHI", "J_PRO"];
-const RANK_THRESH = [10, 15, 20, 25, 30];
-const SPECIAL_POINTS = { "S_BIR": 20, "S_NE0": 30, "S_SHU": 40, "S_REQ": 50, "S_UNK": 60 };
+const J_HP={J_NEM:1,J_SHI:3,J_PRO:5};
+const RANK_THRESH = [10, 15, 20, 25, 30];　//＜修羅王丸ランクアップ数値
+const SPECIAL_POINTS = { "S_BIR": 10, "S_NE0": 20, "S_SHU": 30, "S_REQ": 40, "S_UNK": 50 };　//＜通常の消去スコアに加えて上乗せ
 
 let board=[], yAnim=[], score=store.get("score",0), rankIndex=store.get("rankIndex",0), rankProgress=store.get("rankProgress",0);
 let slashes=[], particles=[]; // Bのエフェクト要素
@@ -433,17 +571,18 @@ function buildRankSelectButtons(){
     img.src = IMG["PATH_"+sym] || "";
     img.alt = sym;
     btn.appendChild(img);
+
+ // ★ここが特殊ボタンのクリックハンドラ
     btn.addEventListener('click', ()=>{
       if(rankIndex!==MAX_RANK_INDEX) return;
       selectedSpecialOverride = sym;
       [...row.children].forEach(el=>el.classList.remove('active'));
       btn.classList.add('active');
 
-      stopAllRankVoices();              // ★追加：前のボイスを停止
+      stopAllRankVoices();              // ★前のボイスを停止
       const v = voiceForSpecial(sym);
       if(v){ try{ v.currentTime=0; v.play().catch(()=>{}); }catch(_){} }
 
-      Sound.play('push', .9);
     });
     row.appendChild(btn);
   });
@@ -502,7 +641,7 @@ function initBoard(){
   prepareDrop();
 }
 
-/* ===== 入力（A） ===== */
+/* ===== 入力 ===== */
 function getGridPos(x,y){
   const rect=canvas.getBoundingClientRect(), nx=x-rect.left, ny=y-rect.top;
   const scale = logicalSize/rect.width;
@@ -531,7 +670,7 @@ function onMove(x,y){
 }
 function onEnd(){ drag.active=false; drag.start=null; drag.t=null; }
 
-/* ===== モード・一時停止（A） ===== */
+/* ===== モード・一時停止） ===== */
 function setMode(mode){
   isKanki=(mode==='kanki');
   document.getElementById("btnKanki").classList.toggle("active",isKanki);
@@ -540,7 +679,7 @@ function setMode(mode){
 }
 function togglePause(){ paused=!paused; $pauseBtn.textContent=paused?"▶ 再開":"⏸ 一時停止"; if(!paused) gameLoop(); }
 
-/* ===== マッチ判定～消去（Aロジック＋Bエフェクト） ===== */
+/* ===== マッチ判定～消去 ===== */
 let lastMatchVH={v:false,h:false};
 function findMatches(checkOnly=true){
   lastMatchVH={v:false,h:false};
@@ -562,8 +701,7 @@ function findMatches(checkOnly=true){
   if(matches.size>0){
     vanishMask = matches; animState="vanish"; vanishP=0;
     // 消去SE（A）
-    Sound.play('pop',1.0);
-    if(lastMatchVH.v) Sound.play('vertical', .9);
+if(lastMatchVH.v) Sound.play('vertical', .9);
     if(lastMatchVH.h) Sound.play('horizontal', .9);
     // エフェクト生成（B風：斬撃＋粒子）
     createSlashEffects(matches);
@@ -573,7 +711,7 @@ function findMatches(checkOnly=true){
   return false;
 }
 
-/* ランク進捗・ボイス（A） */
+/* ランク進捗・ボイス */
 function updateRank(){
   // Post-top progress handling
   if(rankIndex===MAX_RANK_INDEX){
@@ -597,7 +735,7 @@ function updateRank(){
   updateScoresUI();
       }
 
-/* 消去→落下（A：下へ圧縮→上から補充） */
+/* 消去→落下（下へ圧縮→上から補充） */
 const SEED_BASE_CHANCE = 0.06;
 
 // === 特殊ギミック用ユーティリティ ===
@@ -695,7 +833,7 @@ function resolveVanishAndDrop(){
     }
   });
 
-// ★追加：この消去で一度でも特殊ブロックが含まれていれば「回数」として1加算
+// ★この消去で一度でも特殊ブロックが含まれていれば「回数」として1加算
   if (specialsHit.size > 0) {
     if(!(rankIndex===MAX_RANK_INDEX && maxAchieved)) rankProgress++;
   }
@@ -748,7 +886,7 @@ function prepareDrop(){
           if (!jusoHP[empty]) jusoHP[empty] = [];
           if (!jusoHP[r])     jusoHP[r]     = [];
           jusoHP[empty][c] = jusoHP[r][c] || 0;
-          jusoHP[r][c] = 0;
+          jusoHP[r][c] = (J_HP[pick] ?? 1);
           if(!yAnim[empty]) yAnim[empty]=[];
           if(!yVel[empty])  yVel[empty] =[];
           yAnim[empty][c] = -(empty-r)*tileSize;
@@ -774,7 +912,7 @@ function prepareDrop(){
       }
       set(r,c,nb);
       if (!jusoHP[r]) jusoHP[r] = [];
-      jusoHP[r][c] = 0;
+      jusoHP[r][c] = (J_HP[pick] ?? 1);
       if(!yAnim[r]) yAnim[r]=[];
       if(!yVel[r])  yVel[r] =[];
       yAnim[r][c] = -(emptyCount-r)*tileSize;
@@ -801,7 +939,7 @@ function maybeSpawnObstacles(){
     const cur=get(r,c); if(!cur || JUSOS.includes(cur)) continue;
     const pool = ["J_NEM", "J_SHI", "J_PRO"];
     const pick = pool[Math.floor(Math.random()*pool.length)];
-    set(r,c,pick); if(!jusoHP[r]) jusoHP[r]=[]; jusoHP[r][c]=(pick==="J_NEM"?1:(pick==="J_SHI"?2:3)); k++;
+    set(r,c,pick); if(!jusoHP[r]) jusoHP[r]=[]; jusoHP[r][c] = (J_HP[pick] ?? 1); k++;　//←消去HP変更部
   }
 }
 
@@ -907,11 +1045,11 @@ function drawGame(){
     }
     drawBlock(r,c,x,y+ty,a);
   }
-  // B風：斬撃＆粒子
+  // 消去エフェクト：斬撃＆粒子
   drawSlashes();
   drawParticles();
 
-  // 前面スワップ（A）
+  // 前面スワップ）
   if(animState==="swap" && swapPair){
     const {p1,p2,p,back}=swapPair; const prog=Math.min(1,p/(SWAP_ANIM_TIME)), e=Math.sin(prog*Math.PI/2);
     let x1=p1.c*tileSize+(back?(p2.c-p1.c)*tileSize*(1-e):(p2.c-p1.c)*tileSize*e);
@@ -923,7 +1061,7 @@ function drawGame(){
   }
 }
 
-/* スワップ～ループ（A） */
+/* スワップ～ループ */
 function canSwapAndMatch(r1,c1,r2,c2){
   if(JUSOS.includes(get(r1,c1))||JUSOS.includes(get(r2,c2))) return false;
   swap(r1,c1,r2,c2);
@@ -983,7 +1121,7 @@ function gameLoop(){
   requestAnimationFrame(gameLoop);
 }
 
-/* シャッフル（A：手動のみ） */
+/* シャッフル */
 function hasPossibleMoves(){
   for(let r=0;r<size;r++) for(let c=0;c<size;c++){
     if(c+1<size && canSwapAndMatch(r,c,r,c+1)) return true;
@@ -1002,7 +1140,7 @@ function shuffleBoard(){
   animState="drop"; prepareDrop();
 }
 
-/* 起動（A） */
+/* 起動 */
 function initGame(reset=false){
 const parentW = 480;                      // ★固定サイズに
   logicalSize = Math.floor(480/size)*size;  // ★盤面ロジックも固定
@@ -1017,7 +1155,7 @@ const parentW = 480;                      // ★固定サイズに
 }
 function startUp(){ loadImages(()=>{ initGame(true); updateStatus("status: game loaded. ready to play."); gameLoop(); }); }
 
-/* イベント（Aのまま。ボタンSEは se_push に統一） */
+/* イベント（ボタンSEは se_push に統一） */
 const onClickSE = ()=>Sound.play('push', .9);
 canvas.addEventListener('mousedown',e=>onStart(e.clientX,e.clientY));
 canvas.addEventListener('mousemove',e=>onMove(e.clientX,e.clientY));
@@ -1043,10 +1181,10 @@ startUp();
   <audio id="vo_reverse" src="audio/vo_reverse.mp3" preload="auto"></audio>
   <audio id="vo_rank5" src="audio/vo_rank5.mp3" preload="auto"></audio>
 
-<div id="maxResetBtn" title="MAXをリバース">↺</div>
+<div id="maxResetBtn" title="MAXをリセット">↺</div>
 <div id="maxResetConfirm" role="dialog" aria-modal="true">
   <div class="panel">
-    <div class="title">修羅王丸の覚醒ランクをリバースしますか</div>
+    <div class="title">修羅王丸の覚醒ランクをリセットしますか</div>
     <div class="cmds">
       <button id="maxResetNo">いいえ</button>
       <button id="maxResetYes" class="primary">はい</button>
@@ -1084,5 +1222,112 @@ startUp();
   }
   window.__gateMaxResetBtn = gateMaxResetBtn;
 })();</script>
+
+<!-- 操作方法（画像ビューア） -->
+<button id="howtoBtn" title="操作方法" aria-label="操作方法">
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <path fill="currentColor" d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17h-1.5a2.5 2.5 0 0 0-2.5 2H6.5A2.5 2.5 0 0 1 4 18.5v-14Z"/>
+    <path fill="currentColor" d="M7 4h11v12h-1.5A2.5 2.5 0 0 0 14 18H7V4Z"/>
+  </svg>
+</button>
+<div id="howtoModal" role="dialog" aria-modal="true" aria-label="操作方法" hidden>
+  <div class="howto-panel">
+    <button class="howto-close" aria-label="閉じる">×</button>
+    <div class="howto-img-wrap">
+      <button class="howto-nav prev" aria-label="前の画像">←</button>
+      <img id="howtoImg" alt="操作方法" />
+      <button class="howto-nav next" aria-label="次の画像">→</button>
+    </div>
+    <div class="howto-caption"><span id="howtoCounter">1 / 1</span></div>
+  </div>
+</div>
+
+
+<script>
+(()=>{
+  const IMGS=(typeof HOWTO_IMAGES!=='undefined'&&Array.isArray(HOWTO_IMAGES)&&HOWTO_IMAGES.length>0)?HOWTO_IMAGES:[];
+  const $btn=document.getElementById('howtoBtn');
+  const $modal=document.getElementById('howtoModal');
+  const $img=document.getElementById('howtoImg');
+  const $counter=document.getElementById('howtoCounter');
+  const $prev=$modal?.querySelector('.howto-nav.prev');
+  const $next=$modal?.querySelector('.howto-nav.next');
+  const $close=$modal?.querySelector('.howto-close');
+  let idx=0,wasPaused=false;
+  IMGS.forEach(src=>{const i=new Image();i.src=src;});
+  function show(i){ if(IMGS.length===0){$img?.removeAttribute('src'); if($counter)$counter.textContent='0 / 0'; return;} idx=(i+IMGS.length)%IMGS.length; $img.src=IMGS[idx]; if($counter)$counter.textContent=(idx+1)+' / '+IMGS.length; }
+  function prev(){show(idx-1);} function next(){show(idx+1);}
+  function onKey(e){if(e.key==='ArrowLeft')prev();else if(e.key==='ArrowRight')next();else if(e.key==='Escape')closeHowto();}
+  function addSwipe(el){let sx=0,dx=0,act=false;const onStart=ev=>{act=true;sx=ev.touches[0].clientX;dx=0;};const onMove=ev=>{if(act)dx=ev.touches[0].clientX-sx;};const onEnd=_=>{if(act){if(dx<-40)next();else if(dx>40)prev();}act=false;sx=dx=0;};el.addEventListener('touchstart',onStart,{passive:true});el.addEventListener('touchmove',onMove,{passive:true});el.addEventListener('touchend',onEnd,{passive:true});el.__howtoSwipe={onStart,onMove,onEnd};}
+  function removeSwipe(el){const h=el.__howtoSwipe;if(!h)return;el.removeEventListener('touchstart',h.onStart);el.removeEventListener('touchmove',h.onMove);el.removeEventListener('touchend',h.onEnd);delete el.__howtoSwipe;}
+  function openHowto(){ try{ if(typeof paused!=='undefined'&&!paused){wasPaused=false;togglePause();} else {wasPaused=true;} }catch(_){} show(idx); $modal.hidden=false; window.addEventListener('keydown',onKey,{passive:true}); if($img) addSwipe($img); }
+  function closeHowto(){ $modal.hidden=true; window.removeEventListener('keydown',onKey); if($img) removeSwipe($img); try{ if(typeof paused!=='undefined'&&paused&&!wasPaused){togglePause();} }catch(_){} }
+  $btn?.addEventListener('click',openHowto); $prev?.addEventListener('click',prev); $next?.addEventListener('click',next); $close?.addEventListener('click',closeHowto);
+})();
+</script>
+
+
+<!-- MAXリセットUI（追加） -->
+<div id="maxResetBtn" title="MAXをリバース" aria-label="MAXをリバース">↺</div>
+<div id="maxResetConfirm" role="dialog" aria-modal="true" hidden>
+  <div class="panel">
+    <div class="title">修羅王丸の覚醒ランクをリバースしますか</div>
+    <div class="cmds">
+      <button id="maxResetNo">いいえ</button>
+      <button id="maxResetYes" class="primary">はい</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(() => {
+  const $btn = document.getElementById('maxResetBtn');
+  const $dlg = document.getElementById('maxResetConfirm');
+  const $yes = document.getElementById('maxResetYes');
+  const $no  = document.getElementById('maxResetNo');
+
+  window.__gateMaxResetBtn = function(){
+    if(!$btn) return;
+    const need = (typeof RANK_THRESH!=='undefined' && Array.isArray(RANK_THRESH))
+      ? RANK_THRESH[MAX_RANK_INDEX] : (typeof RANK_REQUIRE!=='undefined' ? RANK_REQUIRE[MAX_RANK_INDEX] : 0);
+
+    const isMax = (typeof rankIndex!=='undefined' && typeof rankProgress!=='undefined')
+      && (rankIndex === MAX_RANK_INDEX)
+      && ( (typeof maxAchieved!=='undefined' && maxAchieved===true) || (need>0 && rankProgress >= need) );
+
+    $btn.style.display = isMax ? '' : 'none';
+  };
+
+  $btn && $btn.addEventListener('click', () => { if($dlg) $dlg.hidden = false; });
+  $no  && $no .addEventListener('click', () => { if($dlg) $dlg.hidden = true; });
+  $yes && $yes.addEventListener('click', () => {
+    try{
+      window.maxAchieved = false;
+      if (window.store && store.set) store.set('maxAchieved', false);
+
+      window.rankIndex = 0;
+      window.rankProgress = 0;
+      if (window.store && store.set) {
+        store.set('rankIndex', 0);
+        store.set('rankProgress', 0);
+      }
+
+      if (typeof updateScoresUI === 'function') updateScoresUI();
+
+      const v = document.getElementById('vo_reverse');
+      if (v) { v.currentTime = 0; v.volume = 1.0; v.play().catch(()=>{}); }
+    }catch(_){}
+    if($dlg) $dlg.hidden = true;
+    if (typeof __gateMaxResetBtn === 'function') __gateMaxResetBtn();
+  });
+
+  document.addEventListener('DOMContentLoaded', () => setTimeout(__gateMaxResetBtn, 0));
+  ['click','keyup','touchend','visibilitychange'].forEach(ev=>{
+    window.addEventListener(ev, ()=>{ try{ __gateMaxResetBtn(); }catch(_){} }, {passive:true});
+  });
+})();
+</script>
+
 </body>
 </html>
