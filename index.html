@@ -30,7 +30,7 @@
   body{ margin:0; color:var(--ink); font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif;
     background: radial-gradient(1400px 680px at 50% -10%, #1b1c20 0%, #0c0c0e 55%, var(--bg-0) 100%),
                linear-gradient(180deg, #0b0b0c 0%, #09090a 100%); min-height:100dvh; text-align:center; }
-  .wrap{ max-width:640px; margin:22px auto 28px; padding:16px; }
+  .wrap{ max-width:640px; margin:0 auto 28px; padding:16px; }
   .panel{ margin:0 auto; padding:16px 14px; border-radius:16px; background:#121316; border:1px solid var(--line);
     box-shadow:0 18px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset; backdrop-filter:saturate(120%) blur(8px); }
   /* タイトルサイズ＝B */
@@ -509,9 +509,19 @@ function userGesture(){
       bgmBtn.textContent="♪ BGM OFF";
       bgmBtn.classList.add('active'); 
     }).catch(()=>{
-      // 自動再生失敗時はOFFに戻す
-      bgmOn=false; store.set("bgmOn", false);
-      pauseAllBGM(); bgmBtn.textContent="♪ BGM ON"; bgmBtn.classList.remove('active');
+      // 自動再生がブロック：ユーザー操作で1回だけ復帰（ON設定時のみ）
+      const resumeOnce = ()=>{
+        if(!bgmOn) return;
+        try{ pauseAllBGM(); currentBGM().currentTime=0; currentBGM().play().catch(()=>{}); }catch(_){}
+        document.removeEventListener('pointerdown', resumeOnce, true);
+        document.removeEventListener('keydown', resumeOnce, true);
+        document.removeEventListener('touchstart', resumeOnce, true);
+        bgmBtn.textContent="♪ BGM OFF";
+        bgmBtn.classList.add('active');
+      };
+      document.addEventListener('pointerdown', resumeOnce, true);
+      document.addEventListener('keydown', resumeOnce, true);
+      document.addEventListener('touchstart', resumeOnce, true);
     }); 
   }
   else{ 
@@ -939,12 +949,16 @@ function updateScoresUI(){
   // 暗躍値：B（Lvは出さない）
   $score.textContent = `暗躍値: ${score}`;
   // 右上ランク（A）
-  const label = `修羅王丸: ${RANKS[rankIndex].name} `;
+  const label = (rankIndex===MAX_RANK_INDEX && hasReachedMaxRank) ? `修羅王丸: 永遠の焦土 ` : `修羅王丸: ${RANKS[rankIndex].name} `;
   if ($rank.firstChild) $rank.firstChild.textContent = label; else $rank.textContent = label;
   $rankProgress = document.getElementById("rankProgress") || (()=>{
     const sp=document.createElement('span'); sp.className='rank-progress'; sp.id='rankProgress'; $rank.appendChild(sp); return sp;
   })();
-  $rankProgress.textContent = rankIndex===MAX_RANK_INDEX ? 'MAX' : `(${rankProgress}/${RANK_THRESH[rankIndex]})`;
+  if (rankIndex===MAX_RANK_INDEX){
+    $rankProgress.textContent = hasReachedMaxRank ? 'MAX' : `(${unknownStageProgress}/${UNKNOWN_THRESH})`;
+  } else {
+    $rankProgress.textContent = `(${rankProgress}/${RANK_THRESH[rankIndex]})`;
+  }
   
   // 最終ランクで選択行を表示 (リセット後も非表示にしない)
   const selRow = document.getElementById('rankSelectRow');
@@ -1070,6 +1084,16 @@ function findMatches(checkOnly=true){ /* (省略: 変更なし) */
 function updateRank(){ /* (省略: 変更なし) */
   if(rankIndex<MAX_RANK_INDEX && rankProgress>=RANK_THRESH[rankIndex]){
     rankProgress=0; rankIndex++;
+    /* ensure Unknown gate resets */
+    try{ 
+      if (typeof MAX_RANK_INDEX!=='undefined' && rankIndex===MAX_RANK_INDEX){ 
+        if (typeof hasReachedMaxRank!=='undefined'){ hasReachedMaxRank = false; try{ store.set('hasReachedMaxRank', false); }catch(_){} }
+        if (typeof unknownStageProgress==='undefined' || typeof unknownStageProgress!=='number') unknownStageProgress = 0; 
+        else unknownStageProgress = 0;
+        try{ if (typeof store!=='undefined' && store.set) store.set('unknownStageProgress', 0); }catch(_){}
+      } 
+    }catch(_){}
+
     const v = document.getElementById(`vo_rank${Math.min(rankIndex,4)}`);
     if(v){ try{ v.currentTime=0; v.play().catch(()=>{}); }catch(_){} }
     Sound.play('bell', 1.0); // ランクアップ時、鐘を同時再生
@@ -1133,6 +1157,20 @@ function resolveVanishAndDrop(){ /* (省略: 変更なし) */
     else if (sym==="S_SHU")                  Sound.play('circle', 1.0);
     else if (sym==="S_UNK")                  Sound.play('cross', 1.0);
   });
+
+  /* === Unknown 闘値インクリメント（MAX直前のみ） === */
+  try{
+    if (specialsHit && specialsHit.has && specialsHit.has("S_UNK")){
+      if (typeof rankIndex!=='undefined' && typeof MAX_RANK_INDEX!=='undefined' && rankIndex===MAX_RANK_INDEX && !hasReachedMaxRank){
+        if (typeof unknownStageProgress!=='number') unknownStageProgress = Number(unknownStageProgress)||0;
+        unknownStageProgress += 1;
+        try{ if (typeof store!=='undefined' && store.set) store.set('unknownStageProgress', unknownStageProgress); }catch(_){}
+        try{ if (typeof updateScoresUI==='function') updateScoresUI(); }catch(_){}
+        try{ if (typeof maybeReachMax==='function') maybeReachMax(); }catch(_){}
+      }
+    }
+  }catch(_){}
+
 
   const extra = applySpecialGimmicks(vanishMask);
   extra.forEach(p=> vanishMask.add(p));
@@ -1464,16 +1502,30 @@ function shuffleBoard(){ /* (省略: 変更なし) */
 /* 起動 (省略: 変更なし) */
 function initGame(reset=false){ /* (省略: 変更なし) */
 const parentW = 480;
-  logicalSize = Math.floor(480/size)*size;
+  
+  // Responsive sizing based on container width (prevents right-edge clipping on mobile)
+  var container = canvas.parentElement;
+  var rect = container ? container.getBoundingClientRect() : {width: Math.min(innerWidth, 640)};
+  var avail = Math.max(240, Math.floor(rect.width) - 2); // guard lower bound
+  logicalSize = Math.floor(avail/size)*size;
   tileSize = logicalSize/size;
-  DPR=Math.max(1,Math.min(3,Math.floor(window.devicePixelRatio||1)));
-  canvas.width=logicalSize*DPR; canvas.height=logicalSize*DPR; ctx.setTransform(1,0,0,1,0,0); ctx.scale(DPR,DPR);
-  canvas.style.width = logicalSize + 'px'; canvas.style.height = 'auto';
+  DPR = Math.max(1, Math.min(3, Math.floor(window.devicePixelRatio||1)));
+  canvas.width = logicalSize*DPR; 
+  canvas.height = logicalSize*DPR; 
+  ctx.setTransform(1,0,0,1,0,0); 
+  ctx.scale(DPR,DPR);
+  canvas.style.width = logicalSize + 'px';
+  canvas.style.height = logicalSize + 'px';
+
   if(reset) initBoard();
   updateScoresUI(); setMode('kanki');
   if(!reset) gameLoop();
 }
 function startUp(){ loadImages(()=>{ initGame(true); updateStatus("status: game loaded. ready to play."); gameLoop(); }); }
+
+// Resize-fit without resetting board
+function __fitBoard(){ try{ initGame(false); }catch(_){} }
+addEventListener('resize', __fitBoard);
 
 /* イベント (調整) */
 canvas.addEventListener('mousedown',e=>onStart(e.clientX,e.clientY));
