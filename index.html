@@ -2070,6 +2070,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
 })();
 </script>
+<style>
+  /* スマホ右端切れ対策：親幅にフィット（PCは従来通り最大480px） */
+  #gameCanvas{
+    width: min(100%, 480px) !important;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+</style>
 
 </body>
 </html>
