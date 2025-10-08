@@ -30,7 +30,7 @@
   body{ margin:0; color:var(--ink); font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif;
     background: radial-gradient(1400px 680px at 50% -10%, #1b1c20 0%, #0c0c0e 55%, var(--bg-0) 100%),
                linear-gradient(180deg, #0b0b0c 0%, #09090a 100%); min-height:100dvh; text-align:center; }
-  .wrap{ max-width:640px; margin:0 auto 28px; padding:16px; }
+  .wrap{ max-width:640px; margin:22px auto 28px; padding:16px; }
   .panel{ margin:0 auto; padding:16px 14px; border-radius:16px; background:#121316; border:1px solid var(--line);
     box-shadow:0 18px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset; backdrop-filter:saturate(120%) blur(8px); }
   /* タイトルサイズ＝B */
@@ -1502,30 +1502,16 @@ function shuffleBoard(){ /* (省略: 変更なし) */
 /* 起動 (省略: 変更なし) */
 function initGame(reset=false){ /* (省略: 変更なし) */
 const parentW = 480;
-  
-  // Responsive sizing based on container width (prevents right-edge clipping on mobile)
-  var container = canvas.parentElement;
-  var rect = container ? container.getBoundingClientRect() : {width: Math.min(innerWidth, 640)};
-  var avail = Math.max(240, Math.floor(rect.width) - 2); // guard lower bound
-  logicalSize = Math.floor(avail/size)*size;
+  logicalSize = Math.floor(480/size)*size;
   tileSize = logicalSize/size;
-  DPR = Math.max(1, Math.min(3, Math.floor(window.devicePixelRatio||1)));
-  canvas.width = logicalSize*DPR; 
-  canvas.height = logicalSize*DPR; 
-  ctx.setTransform(1,0,0,1,0,0); 
-  ctx.scale(DPR,DPR);
-  canvas.style.width = logicalSize + 'px';
-  canvas.style.height = logicalSize + 'px';
-
+  DPR=Math.max(1,Math.min(3,Math.floor(window.devicePixelRatio||1)));
+  canvas.width=logicalSize*DPR; canvas.height=logicalSize*DPR; ctx.setTransform(1,0,0,1,0,0); ctx.scale(DPR,DPR);
+  canvas.style.width = logicalSize + 'px'; canvas.style.height = 'auto';
   if(reset) initBoard();
   updateScoresUI(); setMode('kanki');
   if(!reset) gameLoop();
 }
 function startUp(){ loadImages(()=>{ initGame(true); updateStatus("status: game loaded. ready to play."); gameLoop(); }); }
-
-// Resize-fit without resetting board
-function __fitBoard(){ try{ initGame(false); }catch(_){} }
-addEventListener('resize', __fitBoard);
 
 /* イベント (調整) */
 canvas.addEventListener('mousedown',e=>onStart(e.clientX,e.clientY));
