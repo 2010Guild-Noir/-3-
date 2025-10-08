@@ -161,10 +161,10 @@ details.help li {
 /* === インデックスボタン＋モーダル (新規) === */
 /* 右上に固定するボタン（インデックス） */
 #indexBtn{
-  position:fixed;top:10px;right:10px;width:36px;height:36px;
+  position:fixed;top:10px;right:10px;width:40px;height:40px;
   display:inline-grid;place-items:center;border-radius:10px;border:1px solid var(--line);
   /* アイコンは適宜変更してください。ここではデフォルトのhowtoアイコンを流用 */
-  background:rgba(20,20,20,.9) url("images/howtobutton.png") center/20px 20px no-repeat;
+  background:rgba(20,20,20,.9) url("images/howtobutton.png") center/28px 28px no-repeat;
   color:transparent;cursor:pointer;z-index:10005; border-color:#4169E1;
   /* ★発光効果 */
   box-shadow:0 0 0 rgba(127, 183, 255, 0);
@@ -2076,6 +2076,21 @@ window.addEventListener("DOMContentLoaded", () => {
     width: min(100%, 480px) !important;
     height: auto;
     aspect-ratio: 1 / 1;
+  }
+</style>
+<style>
+  /* スマホだけ盤面を“横幅いっぱい”に近づける（ロジック無変更） */
+  @media (max-width: 480px) {
+    /* パネルの左右パディングを少し削って内側幅を広げる */
+    .wrap { padding-left: 8px; padding-right: 8px; }      /* 16px → 8px */
+    .panel { padding-left: 8px; padding-right: 8px; }     /* 14px → 8px */
+
+    /* 親の内側幅いっぱいまで広げる。上限は必要なら少しだけ拡大OK */
+    #gameCanvas{
+      width: min(100%, 500px) !important;  /* 例：上限480→500。480のままでも可 */
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
   }
 </style>
 
