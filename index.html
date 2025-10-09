@@ -122,11 +122,11 @@ canvas{ display:block; margin:18px auto; width:min(96vw, 480px); height:auto; as
 
   /* 図鑑のタグ */
   .char-tag{ display:inline-block; font-size:10px; padding:3px 6px; border-radius:4px; font-weight:700; border:1px solid #444; margin-left:6px; }
-  .char-tag.yellow{ background:#4d4200; border-color:#6b5e00; color:#ffd900; }
-  .char-tag.blue  { background:#0c2a4a; border-color:#174a7a; color:#7fc8ff; }
-  .char-tag.red   { background:#3a0c12; border-color:#5a1c22; color:#ff8a8a; }
+  .char-tag.yellow{ background:#4d4200; border-color:#6b5e00; color:#ffd900; } /* 合歓=黄色 */
+  .char-tag.blue  { background:#0c2a4a; border-color:#174a7a; color:#7fc8ff; }/* 辰十郎=青 */
+  .char-tag.red   { background:#3a0c12; border-color:#5a1c22; color:#ff8a8a; }/* プロパガンダ=赤 */
   .char-tag.neutral{ background:#333; color:#ccc; }
-  .char-tag.orange{ background:#4a2a00; border-color:#6a3a00; color:#ffb25f; }
+  .char-tag.orange{ background:#4a2a00; border-color:#6a3a00; color:#ffb25f; }/* 特殊=橙 */
 
   /* 最終ランク時：特殊選択行のアイコンボタン */
   #rankSelectRow .btn-icon{
@@ -264,7 +264,7 @@ details.help li {
   <div class="wrap">
     <div class="panel">
       <div class="hud">
-        <div class="badge" id="score">暗躍値: 0</div> <div class="badge" id="rank">修羅王丸: バース <span class="rank-progress" id="rankProgress"></span></div>
+        <div class="badge" id="score">暗躍値: 0</div> <div class="badge" id="rank">修羅王丸: トランスフォーム <span class="rank-progress" id="rankProgress"></span></div>
       </div>
 
       <canvas id="gameCanvas"></canvas>
@@ -604,7 +604,7 @@ const CHARACTERS = [
   { sym: "HANZO", name: "ハンゾウ", tag: "通常", desc: "修羅王丸の駒たる式神。基礎的な暗躍を担う。", image: "HANZO", unlock: { key: "initial" } },
   { sym: "MUTSU", name: "陸奥怪童", tag: "通常", desc: "修羅王丸の手足たる式神。基礎的な暗躍を担う。", image: "MUTSU", unlock: { key: "initial" } },
 
-  { sym: "S_BIR", name: "修羅王丸・バース", tag: "特殊", desc: "修羅王丸の最初の姿。縦列を消去する。", image: "S_BIR", unlock: { key: "rank", value: 0 } }, /* 0に修正 */
+  { sym: "S_BIR", name: "修羅王丸・トランスフォーム", tag: "特殊", desc: "修羅王丸の最初の姿。縦列を消去する。", image: "S_BIR", unlock: { key: "rank", value: 0 } }, /* 0に修正 */
   { sym: "S_NE0", name: "修羅王丸・ネオレトロ", tag: "特殊", desc: "人の姿を捨てた修羅王丸の姿。縦列消去（十字強化モードで縦列+両隣）。", image: "S_NE0", unlock: { key: "rank", value: 1 } },
   { sym: "S_SHU", name: "修羅王丸・しゅらちゃん", tag: "特殊", desc: "ネオレトロを切り捨て生まれた存在。広範囲を円形に消去する。", image: "S_SHU", unlock: { key: "rank", value: 2 } },
   { sym: "S_REQ", name: "修羅王丸・レクイエム", tag: "特殊", desc: "新たな境地を求めて生まれた存在。横列消去（十字強化モードで横列+上下隣）。", image: "S_REQ", unlock: { key: "rank", value: 3 } },
@@ -618,7 +618,9 @@ let unlockedChars = store.get("unlockedChars", { initial: true, juso_spawn: fals
 
 function tagClassByChar(ch){ /* (省略: 変更なし) */
   if (Array.isArray(SPECIALS) && SPECIALS.includes(ch.sym)) return "orange";
-  if (ch.sym === "J_NEM" || ch.sym === "J_SHI" || ch.sym === "J_PRO") return "red";
+  if (ch.sym === "J_NEM") return "yellow";
+  if (ch.sym === "J_SHI") return "blue";
+  if (ch.sym === "J_PRO") return "red";
   return "neutral";
 }
 function updateCharModalContent(){ /* (省略: 変更なし) */
@@ -850,7 +852,7 @@ function resetRank(){
 
 /* ===== ランク・種別 (省略: 変更なし) ===== */
 const RANKS = [ /* (省略: 変更なし) */
-  { key:"S_BIR", name:"バース", score: 100 },
+  { key:"S_BIR", name:"トランスフォーム", score: 100 },
   { key:"S_NE0", name:"ネオレトロ", score: 200 },
   { key:"S_SHU", name:"しゅらちゃん", score: 300 },
   { key:"S_REQ", name:"レクイエム", score: 400 },
@@ -920,15 +922,15 @@ function buildRankSelectButtons(){ /* (省略: 変更なし) */
 /* ===== RankMAX (Rank 5) の名称定義 ===== */
 // NORMALSとSPECIALSに続いて、ランクの名称一覧を定義します。
 // rankIndex (1-based) から名称を取得できるように、配列のインデックスを調整する必要があります。
-// rankIndex 0: バース
+// rankIndex 0: トランスフォーム
 // rankIndex 1: ネオレトロ
 // rankIndex 2: しゅらちゃん
 // rankIndex 3: レクイエム
 // rankIndex 4: アンノウン
 // rankIndex 5: 永遠の焦土 (Rank MAX)
 const RANK_TITLES = [
-  "バース", // rankIndex = 0 or 1 (初期値/Rank 1として使用する想定)
-  "ネオレトロ", // rankIndex = 1
+  "トランスフォーム", // rankIndex = 0 or 1 (初期値/Rank 1として使用する想定)
+  "ネオレトロ", // rankIndex = 1ｓ
   "しゅらちゃん", // rankIndex = 2
   "レクイエム", // rankIndex = 3
   "アンノウン", // rankIndex = 4 (MAX_RANK_INDEXに相当)
@@ -1144,7 +1146,8 @@ function applySpecialGimmicks(baseMatches){ /* (省略: 変更なし) */
 
 function resolveVanishAndDrop(){ /* (省略: 変更なし) */
   if(!vanishMask) return;
-
+ // ★同一 vanish サイクル中に同じお邪魔へ複数回ダメージを入れないためのメモ
+  const damagedThisVanish = new Set();
   const specialsHit = new Set();
   vanishMask.forEach(pos=>{
     const [r,c] = pos.split(',').map(Number);
@@ -1190,7 +1193,12 @@ function resolveVanishAndDrop(){ /* (省略: 変更なし) */
         if(!dr && !dc) continue;
         const tr=r+dr, tc=c+dc;
         if(JUSOS.includes(get(tr,tc)) && jusoHP[tr][tc]>0){
-          jusoHP[tr][tc]--;
+        // ★同じ座標にこのサイクルで既に当てていないかチェック
+        const key = tr + ',' + tc;
+        if (!damagedThisVanish.has(key)) {
+        jusoHP[tr][tc]--;
+        damagedThisVanish.add(key);
+        }
           if (jusoHP[tr][tc]===0){
             set(tr,tc,null);
             jusoHP[tr][tc] = 0;
@@ -1885,7 +1893,7 @@ window.addEventListener("DOMContentLoaded", () => {
     var DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
     var REDUCED=false; try{ REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){}
     var cvs=document.createElement('canvas');
-    cvs.id='fxCanvas'; Object.assign(cvs.style,{position:'fixed',inset:'0',pointerEvents:'none',zIndex:1,background:'transparent',display:'none'});
+    cvs.id = 'infernoCanvas'; Object.assign(cvs.style,{position:'fixed',inset:'0',pointerEvents:'none',zIndex:1,background:'transparent',display:'none'});
     document.body.appendChild(cvs);
     var ctx=cvs.getContext('2d',{alpha:true});
     function resize(){ var w=Math.floor(innerWidth*DPR), h=Math.floor(innerHeight*DPR);
@@ -1968,6 +1976,8 @@ window.addEventListener("DOMContentLoaded", () => {
       if (unknownStageProgress >= UNKNOWN_THRESH){
         hasReachedMaxRank = true; try{ store.set('hasReachedMaxRank', true); }catch(_){}
         try{ var v5=document.getElementById('vo_rank5'); if(v5){ v5.currentTime=0; v5.play().catch(()=>{}); } }catch(_){}
+        try{ if (typeof window.playFinalRankMAXCeremony==='function') window.playFinalRankMAXCeremony(); }catch(_){}
+        try{ if (typeof playFinalRankMAXCeremony==='function') playFinalRankMAXCeremony(); }catch(_){}
         try{ var row=document.getElementById('rankSelectRow'); if(row){ row.style.display=''; } }catch(_){}
         try{ if(typeof updateScoresUI==='function') updateScoresUI(); }catch(_){}
       }
@@ -2093,6 +2103,238 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 </style>
+
+
+
+
+<!-- ===== RankMAX Ceremony: inferno + (optional) vignette + shake ===== -->
+<script>
+(function(){
+  if (window.__infernoMAXInjected) return; window.__infernoMAXInjected = true;
+
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+
+  // ---- 専用キャンバス：既存の fxCanvas 等と衝突しない ----
+  function ensureInfernoCanvas(){
+    var cvs = document.getElementById('infernoCanvas');
+    if (cvs) return cvs;
+    cvs = document.createElement('canvas');
+    cvs.id = 'infernoCanvas';
+    cvs.style.position = 'fixed';
+    cvs.style.left = '0';
+    cvs.style.top = '0';
+    cvs.style.width = '100vw';
+    cvs.style.height = '100vh';
+    cvs.style.pointerEvents = 'none';
+    cvs.style.zIndex = '2147483647';     // 最前面
+    cvs.style.display = 'none';
+    document.body.appendChild(cvs);
+
+    function resize(){
+      var dpr = Math.min(2, (window.devicePixelRatio||1));
+      cvs.width  = Math.floor(innerWidth*dpr);
+      cvs.height = Math.floor(innerHeight*dpr);
+      cvs.style.width  = innerWidth + 'px';
+      cvs.style.height = innerHeight + 'px';
+    }
+    addEventListener('resize', resize);
+    resize();
+    return cvs;
+  }
+
+  // ---- BGM/SE 一時ダッキング（VOが主役） ----
+  function duckVolumes(ms, bgmMul, seMul){
+    try{
+      const prevBgm = (typeof getBGMVol === 'function') ? getBGMVol()
+                       : (Number(localStorage.getItem('bgmVol')) || 0.35);
+      const prevSe  = (typeof Sound !== 'undefined' && typeof Sound.vol === 'number') ? Sound.vol
+                       : (Number(localStorage.getItem('seVol')) || 0.25);
+      try{ if (typeof setBGMVol === 'function') setBGMVol(clamp01(prevBgm * bgmMul)); }catch(_){}
+      try{ if (typeof Sound !== 'undefined') Sound.vol = clamp01(prevSe * seMul); }catch(_){}
+      setTimeout(()=>{
+        try{ if (typeof setBGMVol === 'function') setBGMVol(prevBgm); }catch(_){}
+        try{ if (typeof Sound !== 'undefined') Sound.vol = prevSe; }catch(_){}
+      }, ms);
+    }catch(_){}
+  }
+
+  // ---- SE 再生（プール→無ければ <audio>） ----
+  function playSE(nameOrId, mul){
+    mul = (mul==null ? 0.6 : mul);
+    try{
+      if (typeof Sound!=='undefined' && typeof Sound.play==='function'){
+        Sound.play(nameOrId, mul); return;
+      }
+    }catch(_){}
+    try{
+      var id = nameOrId.startsWith('se_') ? nameOrId : ('se_'+nameOrId);
+      var el = document.getElementById(id);
+      if (el){ el.currentTime=0; el.volume = clamp01(mul); el.play().catch(()=>{}); }
+    }catch(_){}
+  }
+
+  // ---- 小さく画面揺れ（CSS変形、操作負荷ゼロ） ----
+  function startShake(totalMs, ampPx){
+    if (!ampPx) return;
+    const el = document.documentElement; // 画面全体
+    const t0 = performance.now();
+    let raf;
+    (function tick(now){
+      const k = (now - t0) / totalMs;
+      if (k >= 1){
+        el.style.transform = ''; cancelAnimationFrame(raf); return;
+      }
+      const a = ampPx*(1-k); // だんだん弱める
+      const x = (Math.random()*2-1)*a;
+      const y = (Math.random()*2-1)*a;
+      el.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)';
+      raf = requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  // ---- 炎の幕＋火の粉 ----
+  function showInfernoFinale(opts){
+    const {
+      duration = 6500,     // 総時間 ms
+      fadeTail = 1500,      // 後半フェード ms
+      vignette = 0.0,       // 0 で暗転なし（ご要望に合わせ既定 0）
+      shakeAmp = 0.0        // 画面揺れ px（例: 0.6）
+    } = (opts||{});
+
+    const cvs = ensureInfernoCanvas();
+    if (!cvs || !cvs.getContext) return;
+    const ctx = cvs.getContext('2d');
+    const t0 = performance.now();
+    let last = t0;
+    let W = cvs.width, H = cvs.height;
+    const prevDisp = cvs.style.display;
+    cvs.style.display = 'block';
+
+    // 粒子
+    const EMBERS = [];
+    const MAX = Math.min(140, Math.floor((W*H)/40000) + 100);
+    for (let i=0;i<MAX;i++){
+      EMBERS.push({
+        x: Math.random()*W,
+        y: H + Math.random()*80,
+        vy: -(0.6 + Math.random()*1.4),
+        r:  1 + Math.random()*2.0,
+        life: 900 + Math.random()*1600,
+        born: t0 + Math.random()*600
+      });
+    }
+
+    function flameGrad(h, aMul){
+      const g = ctx.createLinearGradient(0, h, 0, h-180);
+      g.addColorStop(0.00, 'rgba(255, 60,  0,'+(0.34*aMul)+')');
+      g.addColorStop(0.45, 'rgba(255,140,  0,'+(0.22*aMul)+')');
+      g.addColorStop(1.00, 'rgba(255,210,140,'+(0.06*aMul)+')');
+      return g;
+    }
+
+    // 揺れ開始
+    startShake(duration, shakeAmp);
+
+    function tick(now){
+      const kAll = (now - t0) / duration;
+      const dt = Math.min(33, now - last); last = now;
+      if (kAll >= 1){
+        try{ ctx.clearRect(0,0,W,H); }catch(_){}
+        cvs.style.display = prevDisp || '';
+        document.documentElement.style.transform = '';
+        return;
+      }
+
+      if (cvs.width!==W || cvs.height!==H){ W=cvs.width; H=cvs.height; }
+      const tailK = (now - t0 <= duration - fadeTail) ? 0
+                    : clamp01((now - t0 - (duration - fadeTail))/fadeTail);
+      const aMul = 1 - tailK;
+
+      ctx.clearRect(0,0,W,H);
+
+      // （任意）ビネット：vignette が 0 なら描かない
+      if (vignette > 0){
+        const fade = (kAll<0.6) ? (kAll/0.6) : (1 - (kAll-0.6)/0.4);
+        ctx.fillStyle = 'rgba(0,0,0,' + (vignette*Math.max(0,Math.min(1,fade))) + ')';
+        ctx.fillRect(0,0,W,H);
+      }
+
+      // 下端の炎
+      const baseY = H - 6;
+      const amp = 8;
+      const wave = Math.sin(now*0.006)*amp;
+      ctx.fillStyle = flameGrad(baseY + wave, aMul);
+      ctx.fillRect(0, baseY-180 + wave, W, 200);
+
+      // 上昇する火の粉
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i=0;i<EMBERS.length;i++){
+        const p = EMBERS[i];
+        if (now < p.born) continue;
+        const age = now - p.born;
+        if (age > p.life){
+          // 終盤は再出現を間引く
+          if (Math.random() < tailK*0.7){ p.born = now + 1e9; continue; }
+          p.x = Math.random()*W;
+          p.y = H + Math.random()*80;
+          p.vy = -(0.6 + Math.random()*1.4);
+          p.r  = 1 + Math.random()*2.0;
+          p.life = 900 + Math.random()*1600;
+          p.born = now + Math.random()*500;
+          continue;
+        }
+        p.y += p.vy * dt * 0.06;
+        const a = (1 - (age / p.life)) * (0.40 * aMul);
+        if (a <= 0) continue;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        const g = 120 + ((i*17 + now*0.05)%80)|0;
+        ctx.fillStyle = 'rgba(255,'+g+',0,'+a+')';
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // ---- 公開API：rankMAX からこれを呼ぶ ----
+  window.playFinalRankMAXCeremony = function(params){
+    if (window.__infernoMAXFired) return;
+    window.__infernoMAXFired = true;
+
+    const cfg = Object.assign({
+      duration: 6500,
+      fadeTail: 2000,
+      vignette: 0.0,   // ← 0で暗転なし（ご要望反映）
+      shakeAmp: 0.6    // ← 控えめに画面揺れ（px）
+    }, (params||{}));
+
+    // VO保護のためダッキング（BGM/SE）：自動で復帰
+    duckVolumes(cfg.duration, 0.55, 0.85);
+
+    // VOの頭を聴かせるため、SEは控えめ音量＆少し遅らせ
+    setTimeout(()=>{ playSE('bell', 0.55); }, 250);
+    setTimeout(()=>{ playSE('cross', 0.60); }, 1100);
+
+    showInfernoFinale(cfg.duration, cfg.fadeTail);
+  };
+
+  // 念のため：vo_rank5 の再生開始でも起動（ロジック改変不要）
+  (function bindOnce(){
+    const v5 = document.getElementById('vo_rank5');
+    if (!v5) return;
+    if (v5.dataset.__infernoBound==='1') return;
+    v5.dataset.__infernoBound = '1';
+    v5.addEventListener('play', function(){
+      try{ window.playFinalRankMAXCeremony(); }catch(_){}
+    }, { once:true });
+  })();
+
+})();
+</script>
+<!-- ===== /RankMAX Ceremony ===== -->
 
 </body>
 </html>
