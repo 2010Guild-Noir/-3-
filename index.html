@@ -260,28 +260,34 @@ details.help li {
 #status{ display:none !important; }
 </style>
 
-<!-- howto vertical override: 1080x1920-friendly -->
-<style id="howto-vertical-override">
+<!-- howto responsive fit override -->
+<style id="howto-fit-override">
+#howtoModal .modal-content{
+  width: min(94vw, 640px);
+  max-height: 92vh;
+  overflow: hidden;
+}
 #howtoModal .howto-img-wrap{
-  position: relative;
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+  aspect-ratio: auto;
   display: grid;
   place-items: center;
-  aspect-ratio: 9/16;
   background: #000;
   border-radius: 10px;
   overflow: hidden;
 }
 #howtoModal .howto-img-wrap img,
 #howtoModal img#howtoImg{
+  max-width: 100%;
+  max-height: 85vh;
   width: auto;
-  height: 100%;
-  max-height: 100%;
+  height: auto;
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
-}
-#howtoModal .modal-content{
-  max-height: 90vh;
+  display: block;
 }
 </style>
 
