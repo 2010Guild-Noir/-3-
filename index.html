@@ -10,8 +10,8 @@
   <meta property="og:title" content="修羅王丸 永遠の焦土パズル" />
   <meta property="og:description" content="あなたの指先が 焦土に《 華 》を咲かせる。" />
   <!-- Replace the URL below with your published absolute URL -->
-  <meta property="og:image" content="https://example.github.io/og.jpg" />
-  <meta property="og:url" content="https://example.github.io/" />
+  <meta property="og:image" content="https://2010guild-noir.github.io/match3-games//og.jpg" />
+  <meta property="og:url" content="https://2010guild-noir.github.io/match3-games//" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="修羅王丸マッチ3ゲーム" />
 
@@ -19,7 +19,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="修羅王丸 永遠の焦土パズル" />
   <meta name="twitter:description" content="あなたの指先が 焦土に《 華 》を咲かせる。" />
-  <meta name="twitter:image" content="https://example.github.io/og.jpg" />
+  <meta name="twitter:image" content="https://2010guild-noir.github.io/match3-games//og.jpg" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
@@ -259,6 +259,32 @@ details.help li {
 /* hide debug status */
 #status{ display:none !important; }
 </style>
+
+<!-- howto vertical override: 1080x1920-friendly -->
+<style id="howto-vertical-override">
+#howtoModal .howto-img-wrap{
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 9/16;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#howtoModal .howto-img-wrap img,
+#howtoModal img#howtoImg{
+  width: auto;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+#howtoModal .modal-content{
+  max-height: 90vh;
+}
+</style>
+
 </head>
 <body>
   <div class="wrap">
