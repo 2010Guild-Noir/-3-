@@ -77,7 +77,7 @@ canvas{ display:block; margin:18px auto; width:min(96vw, 480px); height:auto; as
   .btn-reset:active{ transform:translateY(0); box-shadow:0 6px 14px rgba(0,0,0,.44) inset; }
 
 
-  /* 操作方法＝B（枠内） */
+  /* 操作方法＝ */
   details.help{ text-align:left; background:linear-gradient(180deg,#14151a,#111217); border:1px solid var(--line);
                 border-radius:14px; padding:12px 14px; margin:14px 0; box-shadow:0 12px 32px rgba(0,0,0,.35) inset; }
   details.help summary{ cursor:pointer; font-weight:700; }
@@ -158,7 +158,7 @@ details.help li {
   text-align: left;
 }
 
-/* === インデックスボタン＋モーダル (新規) === */
+/* === インデックスボタン＋モーダル  === */
 /* 右上に固定するボタン（インデックス） */
 #indexBtn{
   position:fixed;top:10px;right:10px;width:40px;height:40px;
@@ -325,7 +325,7 @@ details.help li {
       </div>
       <button class="btn" id="bgmSelectBtn" onclick="toggleBGMSelect(); onClickSE()">♪1 / ♪2 BGM切替</button>
       
-      <button class="btn" id="btnCharIntroIndex" onclick="openCharModal(); onClickSE()">👤 キャラ図鑑</button>
+      <button class="btn" id="btnCharIntroIndex" onclick="openCharModal(); onClickSE()">👤 修羅王丸 顕現図鑑</button>
       
       <button class="btn" id="openHowtoBtn" onclick="openHowto(); onClickSE()">ⓘ 操作説明</button>
       
@@ -862,7 +862,7 @@ const MAX_RANK_INDEX = RANKS.length - 1;
 const NORMALS=["SANZU","MUTSU","HANZO","CHIEKO"];
 const SPECIALS=RANKS.map(r=>r.key);
 const JUSOS=["J_NEM", "J_SHI", "J_PRO"];
-const RANK_THRESH = [5, 5, 5, 5, 1];//ランクアップ闘値
+const RANK_THRESH = [3, 3, 3, 3, 2];//ランクアップ闘値
 const SPECIAL_POINTS = { "S_BIR": 10, "S_NE0": 20, "S_SHU": 30, "S_REQ": 40, "S_UNK": 50 };
 
 let board=[], yAnim=[], score=store.get("score",0), rankIndex=store.get("rankIndex",0), rankProgress=store.get("rankProgress",0);
@@ -948,7 +948,7 @@ function getRankName(index) {
 
 function updateStatus(text){ if($status) $status.textContent=text; }
 function updateScoresUI(){
-  // 暗躍値：B（Lvは出さない）
+  // 暗躍値
   $score.textContent = `暗躍値: ${score}`;
   // 右上ランク（A）
   const label = (rankIndex===MAX_RANK_INDEX && hasReachedMaxRank) ? `修羅王丸: 永遠の焦土 ` : `修羅王丸: ${RANKS[rankIndex].name} `;
@@ -2108,232 +2108,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 <!-- ===== RankMAX Ceremony: inferno + (optional) vignette + shake ===== -->
-<script>
-(function(){
-  if (window.__infernoMAXInjected) return; window.__infernoMAXInjected = true;
 
-  const clamp01 = v => Math.max(0, Math.min(1, v));
-
-  // ---- 専用キャンバス：既存の fxCanvas 等と衝突しない ----
-  function ensureInfernoCanvas(){
-    var cvs = document.getElementById('infernoCanvas');
-    if (cvs) return cvs;
-    cvs = document.createElement('canvas');
-    cvs.id = 'infernoCanvas';
-    cvs.style.position = 'fixed';
-    cvs.style.left = '0';
-    cvs.style.top = '0';
-    cvs.style.width = '100vw';
-    cvs.style.height = '100vh';
-    cvs.style.pointerEvents = 'none';
-    cvs.style.zIndex = '2147483647';     // 最前面
-    cvs.style.display = 'none';
-    document.body.appendChild(cvs);
-
-    function resize(){
-      var dpr = Math.min(2, (window.devicePixelRatio||1));
-      cvs.width  = Math.floor(innerWidth*dpr);
-      cvs.height = Math.floor(innerHeight*dpr);
-      cvs.style.width  = innerWidth + 'px';
-      cvs.style.height = innerHeight + 'px';
-    }
-    addEventListener('resize', resize);
-    resize();
-    return cvs;
-  }
-
-  // ---- BGM/SE 一時ダッキング（VOが主役） ----
-  function duckVolumes(ms, bgmMul, seMul){
-    try{
-      const prevBgm = (typeof getBGMVol === 'function') ? getBGMVol()
-                       : (Number(localStorage.getItem('bgmVol')) || 0.35);
-      const prevSe  = (typeof Sound !== 'undefined' && typeof Sound.vol === 'number') ? Sound.vol
-                       : (Number(localStorage.getItem('seVol')) || 0.25);
-      try{ if (typeof setBGMVol === 'function') setBGMVol(clamp01(prevBgm * bgmMul)); }catch(_){}
-      try{ if (typeof Sound !== 'undefined') Sound.vol = clamp01(prevSe * seMul); }catch(_){}
-      setTimeout(()=>{
-        try{ if (typeof setBGMVol === 'function') setBGMVol(prevBgm); }catch(_){}
-        try{ if (typeof Sound !== 'undefined') Sound.vol = prevSe; }catch(_){}
-      }, ms);
-    }catch(_){}
-  }
-
-  // ---- SE 再生（プール→無ければ <audio>） ----
-  function playSE(nameOrId, mul){
-    mul = (mul==null ? 0.6 : mul);
-    try{
-      if (typeof Sound!=='undefined' && typeof Sound.play==='function'){
-        Sound.play(nameOrId, mul); return;
-      }
-    }catch(_){}
-    try{
-      var id = nameOrId.startsWith('se_') ? nameOrId : ('se_'+nameOrId);
-      var el = document.getElementById(id);
-      if (el){ el.currentTime=0; el.volume = clamp01(mul); el.play().catch(()=>{}); }
-    }catch(_){}
-  }
-
-  // ---- 小さく画面揺れ（CSS変形、操作負荷ゼロ） ----
-  function startShake(totalMs, ampPx){
-    if (!ampPx) return;
-    const el = document.documentElement; // 画面全体
-    const t0 = performance.now();
-    let raf;
-    (function tick(now){
-      const k = (now - t0) / totalMs;
-      if (k >= 1){
-        el.style.transform = ''; cancelAnimationFrame(raf); return;
-      }
-      const a = ampPx*(1-k); // だんだん弱める
-      const x = (Math.random()*2-1)*a;
-      const y = (Math.random()*2-1)*a;
-      el.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)';
-      raf = requestAnimationFrame(tick);
-    })(t0);
-  }
-
-  // ---- 炎の幕＋火の粉 ----
-  function showInfernoFinale(opts){
-    const {
-      duration = 6500,     // 総時間 ms
-      fadeTail = 1500,      // 後半フェード ms
-      vignette = 0.0,       // 0 で暗転なし（ご要望に合わせ既定 0）
-      shakeAmp = 0.0        // 画面揺れ px（例: 0.6）
-    } = (opts||{});
-
-    const cvs = ensureInfernoCanvas();
-    if (!cvs || !cvs.getContext) return;
-    const ctx = cvs.getContext('2d');
-    const t0 = performance.now();
-    let last = t0;
-    let W = cvs.width, H = cvs.height;
-    const prevDisp = cvs.style.display;
-    cvs.style.display = 'block';
-
-    // 粒子
-    const EMBERS = [];
-    const MAX = Math.min(140, Math.floor((W*H)/40000) + 100);
-    for (let i=0;i<MAX;i++){
-      EMBERS.push({
-        x: Math.random()*W,
-        y: H + Math.random()*80,
-        vy: -(0.6 + Math.random()*1.4),
-        r:  1 + Math.random()*2.0,
-        life: 900 + Math.random()*1600,
-        born: t0 + Math.random()*600
-      });
-    }
-
-    function flameGrad(h, aMul){
-      const g = ctx.createLinearGradient(0, h, 0, h-180);
-      g.addColorStop(0.00, 'rgba(255, 60,  0,'+(0.34*aMul)+')');
-      g.addColorStop(0.45, 'rgba(255,140,  0,'+(0.22*aMul)+')');
-      g.addColorStop(1.00, 'rgba(255,210,140,'+(0.06*aMul)+')');
-      return g;
-    }
-
-    // 揺れ開始
-    startShake(duration, shakeAmp);
-
-    function tick(now){
-      const kAll = (now - t0) / duration;
-      const dt = Math.min(33, now - last); last = now;
-      if (kAll >= 1){
-        try{ ctx.clearRect(0,0,W,H); }catch(_){}
-        cvs.style.display = prevDisp || '';
-        document.documentElement.style.transform = '';
-        return;
-      }
-
-      if (cvs.width!==W || cvs.height!==H){ W=cvs.width; H=cvs.height; }
-      const tailK = (now - t0 <= duration - fadeTail) ? 0
-                    : clamp01((now - t0 - (duration - fadeTail))/fadeTail);
-      const aMul = 1 - tailK;
-
-      ctx.clearRect(0,0,W,H);
-
-      // （任意）ビネット：vignette が 0 なら描かない
-      if (vignette > 0){
-        const fade = (kAll<0.6) ? (kAll/0.6) : (1 - (kAll-0.6)/0.4);
-        ctx.fillStyle = 'rgba(0,0,0,' + (vignette*Math.max(0,Math.min(1,fade))) + ')';
-        ctx.fillRect(0,0,W,H);
-      }
-
-      // 下端の炎
-      const baseY = H - 6;
-      const amp = 8;
-      const wave = Math.sin(now*0.006)*amp;
-      ctx.fillStyle = flameGrad(baseY + wave, aMul);
-      ctx.fillRect(0, baseY-180 + wave, W, 200);
-
-      // 上昇する火の粉
-      ctx.globalCompositeOperation = 'lighter';
-      for (let i=0;i<EMBERS.length;i++){
-        const p = EMBERS[i];
-        if (now < p.born) continue;
-        const age = now - p.born;
-        if (age > p.life){
-          // 終盤は再出現を間引く
-          if (Math.random() < tailK*0.7){ p.born = now + 1e9; continue; }
-          p.x = Math.random()*W;
-          p.y = H + Math.random()*80;
-          p.vy = -(0.6 + Math.random()*1.4);
-          p.r  = 1 + Math.random()*2.0;
-          p.life = 900 + Math.random()*1600;
-          p.born = now + Math.random()*500;
-          continue;
-        }
-        p.y += p.vy * dt * 0.06;
-        const a = (1 - (age / p.life)) * (0.40 * aMul);
-        if (a <= 0) continue;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        const g = 120 + ((i*17 + now*0.05)%80)|0;
-        ctx.fillStyle = 'rgba(255,'+g+',0,'+a+')';
-        ctx.fill();
-      }
-      ctx.globalCompositeOperation = 'source-over';
-
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
-
-  // ---- 公開API：rankMAX からこれを呼ぶ ----
-  window.playFinalRankMAXCeremony = function(params){
-    if (window.__infernoMAXFired) return;
-    window.__infernoMAXFired = true;
-
-    const cfg = Object.assign({
-      duration: 6500,
-      fadeTail: 2000,
-      vignette: 0.0,   // ← 0で暗転なし（ご要望反映）
-      shakeAmp: 0.6    // ← 控えめに画面揺れ（px）
-    }, (params||{}));
-
-    // VO保護のためダッキング（BGM/SE）：自動で復帰
-    duckVolumes(cfg.duration, 0.55, 0.85);
-
-    // VOの頭を聴かせるため、SEは控えめ音量＆少し遅らせ
-    setTimeout(()=>{ playSE('bell', 0.55); }, 250);
-    setTimeout(()=>{ playSE('cross', 0.60); }, 1100);
-
-    showInfernoFinale(cfg.duration, cfg.fadeTail);
-  };
-
-  // 念のため：vo_rank5 の再生開始でも起動（ロジック改変不要）
-  (function bindOnce(){
-    const v5 = document.getElementById('vo_rank5');
-    if (!v5) return;
-    if (v5.dataset.__infernoBound==='1') return;
-    v5.dataset.__infernoBound = '1';
-    v5.addEventListener('play', function(){
-      try{ window.playFinalRankMAXCeremony(); }catch(_){}
-    }, { once:true });
-  })();
-
-})();
-</script>
 <!-- ===== /RankMAX Ceremony ===== -->
 
 </body>
