@@ -291,6 +291,49 @@ details.help li {
 }
 </style>
 
+
+<!-- howto nav shift override: move prev/next half outside so they don't cover the image -->
+<style id="howto-nav-shift-override">
+/* 画像外側にボタンをずらすため、ラッパーのはみ出しを許可 */
+#howtoModal .howto-img-wrap{
+  overflow: visible !important;
+  position: relative;
+}
+
+/* よくあるセレクタ群にまとめて適用（どれかにマッチすれば動く） */
+#howtoModal .howto-prev, 
+#howtoModal .howto-next,
+#howtoModal .howto-nav .prev, 
+#howtoModal .howto-nav .next,
+#howtoModal #howtoPrev, 
+#howtoModal #howtoNext,
+#howtoModal .btn-prev,
+#howtoModal .btn-next{
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 5;
+}
+
+/* 左ボタン：自分の直径ぶん外へ（= 追加で半分以上外側に） */
+#howtoModal .howto-prev,
+#howtoModal .howto-nav .prev,
+#howtoModal #howtoPrev,
+#howtoModal .btn-prev{
+  left: 0 !important;
+  transform: translate(calc(-50% - 8px), -50%) !important; /* ← もう半分外へ + 8px隙間 */
+}
+
+/* 右ボタン：自分の直径ぶん外へ */
+#howtoModal .howto-next,
+#howtoModal .howto-nav .next,
+#howtoModal #howtoNext,
+#howtoModal .btn-next{
+  right: 0 !important;
+  transform: translate(calc(50% + 8px), -50%) !important;
+}
+</style>
+
 </head>
 <body>
   <div class="wrap">
@@ -383,9 +426,9 @@ details.help li {
 <div id="howtoModal" role="dialog" aria-modal="true" aria-label="操作方法" hidden class="modal-overlay">
   <div class="modal-content">
     <button class="close-btn" id="howtoCloseBtn" onclick="closeHowto()" aria-label="閉じる"></button> <div class="howto-img-wrap">
-      <button class="howto-nav prev" id="howtoPrev" aria-label="前の画像" onclick="prevHowtoPage()">←</button>
+      <button class="howto-nav prev" id="howtoPrev" aria-label="前の画像" onclick="prevHowtoPage()">◀</button>
       <img id="howtoImg" alt="操作方法" />
-      <button class="howto-nav next" id="howtoNext" aria-label="次の画像" onclick="nextHowtoPage()">→</button>
+      <button class="howto-nav next" id="howtoNext" aria-label="次の画像" onclick="nextHowtoPage()">▶</button>
     </div>
     <div class="howto-caption"><span id="howtoCounter">1 / 1</span></div>
   </div>
